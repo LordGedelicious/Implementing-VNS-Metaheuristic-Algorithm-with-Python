@@ -9,6 +9,13 @@ import os
 import pandas as pd
 
 
+def doesFilenameExist(filename):
+    path_to_folder = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), '..', 'testcase'))
+    path_to_file = os.path.abspath(os.path.join(path_to_folder, filename))
+    return os.path.isfile(path_to_file)
+
+
 def createListOfPredecessors(predecessors):
     # If "predecessors" is a single integer, return a list of integer of 1 length
     # If "predecessors" is a string containing integers separated by commas, return a list of integers
@@ -23,6 +30,9 @@ def createListOfPredecessors(predecessors):
 
 
 def ReadFile(filename):
+    # Precaution if file does not exist
+    if not (doesFilenameExist(filename)):
+        return False
     try:
         path_to_folder = os.path.abspath(os.path.join(
             os.path.dirname(__file__), '..', 'testcase'))

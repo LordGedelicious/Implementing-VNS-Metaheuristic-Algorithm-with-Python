@@ -19,3 +19,19 @@ class Task:
     # Add successor tasks to Task
     def addSuccessors(self, successor):
         self.successors.append(successor)
+
+
+class MainSystem:
+    # Constructor function
+    def __init__(self):
+        self.list_tasks = []
+
+    def addTask(self, task):
+        self.list_tasks.append(task)
+
+    def returnTask(self, task_name):
+        try:
+            index = self.list_tasks.index(task_name)
+            return self.list_tasks[index]
+        except ValueError:
+            return -1
