@@ -2,6 +2,7 @@
 
 class Model:
     # Constructor function
+    # TODO: Tambahin Total Cost berdasarkan metode yang dipilih
     def __init__(self, origin_task, model_name, human, machine, combo):
         self.origin_task = origin_task  # the task that this model belongs to
         self.model_name = model_name  # the model name i.e. X, Y, Z etc.

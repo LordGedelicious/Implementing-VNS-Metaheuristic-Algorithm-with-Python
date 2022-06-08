@@ -2,6 +2,8 @@ from numpy import integer
 from Tasks import *
 from Models import *
 from Reader import *
+from System import *
+from StartImprovement import *
 
 import os
 # other imports
@@ -15,7 +17,7 @@ def doesFilenameExist(filename):
 
 
 def main():
-    main_system = MainSystem()
+    main_system = System()
     bool_FilenameExist = False
     while not bool_FilenameExist:
         src_testcase_file = input(
@@ -23,6 +25,7 @@ def main():
         bool_FilenameExist = doesFilenameExist(src_testcase_file)
     ReadFile(src_testcase_file, main_system)
     main_system.printContents()
+    StartImprovement(main_system)
 
 
 main()
