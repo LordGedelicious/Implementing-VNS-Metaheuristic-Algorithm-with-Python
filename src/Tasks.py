@@ -49,3 +49,9 @@ class Task:
 
     def returnOriginStation(self):
         return self.originStation
+
+    def switchStations(self, task_name):
+        temp_station_a, temp_station_b = self.returnOriginStation(), task_name.returnOriginStation()
+        self.setOriginStation(temp_station_b)
+        task_name.setOriginStation(temp_station_a)
+        

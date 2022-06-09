@@ -12,15 +12,14 @@ import pandas as pd
 def createListOfPredecessors(predecessors):
     # If "predecessors" is a single integer, return a list of integer of 1 length
     # If "predecessors" is a string containing integers separated by commas, return a list of integers
-    if (type(predecessors) == integer):
-        if predecessors != -1:
-            return [predecessors]
-        else:
-            return []
+    temp_list = predecessors.split(",")
+    map_integers = map(int, temp_list)
+    list_integers = list(map_integers)
+    if len(list_integers) == 1 and list_integers[0] == -1:
+        return []
     else:
-        temp_list = predecessors.split(",")
-        map_integers = map(int, temp_list)
-        return list(map_integers)
+        return list_integers
+
 
 # File must be located in the "testcase" directory and have the "txt" extension
 
