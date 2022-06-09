@@ -24,6 +24,10 @@ def main():
             "Enter the name of the testcase file (include the .csv extension): ")
         bool_FilenameExist = doesFilenameExist(src_testcase_file)
     ReadFile(src_testcase_file, main_system)
+    system_cycle_time = 0
+    while system_cycle_time <= 0:
+        system_cycle_time = int(input("Enter the system cycle time: "))
+    main_system.setCycleTime(system_cycle_time)
     main_system.printContents()
     StartImprovement(main_system)
 

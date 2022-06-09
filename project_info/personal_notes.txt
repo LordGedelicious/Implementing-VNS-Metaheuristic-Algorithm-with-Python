@@ -1,0 +1,8 @@
+syarat precedence di stasiun:
+1. semua task adalah starting tasks, ATAU
+2. semua task adalah successor langsung dari starting tasks
+3. semua task adalah tasks yang berurutan (cth : 2-3-4)
+4. semua tasks saling paralel (memiliki starting task yang sama)
+5. semua tasks tidak melanggar salah satu aturan di atas
+
+# NOTE : Tambahin input cycle time, s, sama a

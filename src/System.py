@@ -10,6 +10,7 @@ class System:
         self.list_tasks = []
         self.list_stations = []
         self.num_of_stations = 0
+        self.cycle_time = 0
 
     def addTask(self, task):
         temp_predecessors = task.returnPredecessors()
@@ -26,6 +27,12 @@ class System:
         if temp_station not in self.list_stations:
             self.list_stations.append(temp_station)
             self.num_of_stations += 1
+
+    def setCycleTime(self, cycle_time):
+        self.cycle_time = cycle_time
+
+    def returnCycleTime(self):
+        return self.cycle_time
 
     def returnTaskNames(self):
         list_of_task_names = []
@@ -55,3 +62,5 @@ class System:
             print("This task belongs to the {} station".format(
                 i.returnOriginStation()))
             print()
+        print("The system's cycle time is {} unit of time.".format(
+            self.returnCycleTime()))
