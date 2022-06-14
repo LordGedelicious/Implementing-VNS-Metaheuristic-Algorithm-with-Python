@@ -32,6 +32,7 @@ def checkIfSameStationRule(system, task_a, task_b):
 
 def checkIfPrecedenceRule(system, partition):
     starting_tasks = system.returnStartingTasks()
+    base_tasks = []
     bool_first_checking = True
     for i in partition:
         if system.returnStationFromTask(i) == []:

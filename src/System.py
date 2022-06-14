@@ -8,21 +8,30 @@ class System:
     # Constructor function
     def __init__(self):
         self.list_tasks = []
+        self.list_task_names = []
         self.list_stations = []
         self.list_starting_tasks = []
         self.num_of_stations = 0
         self.cycle_time = 0
+        self.s_value = 0
+        self.a_value = 0
 
     def addTask(self, task):
+        print("Adding task {}".format(task.returnTaskName()))
         temp_predecessors = task.returnPredecessors()
         for i in temp_predecessors:
-            if i in self.list_tasks:
+            print("Predecessor of {} is {}".format(task.returnTaskName(), i))
+            if i in self.list_task_names:
                 prev_predecessors = self.returnTask(i).returnPredecessors()
+                print("Previous predecessors of {} is {}".format(
+                    i, prev_predecessors))
                 if (len(prev_predecessors) != 0):
                     for j in prev_predecessors:
+                        print("Adding predecessor {} to {}".format(j, i))
                         if j not in temp_predecessors:
                             temp_predecessors.insert(0, j)
         task.setPredecessors(temp_predecessors)
+        self.list_task_names.append(task.returnTaskName())
         self.list_tasks.append(task)
         temp_station = task.returnOriginStation()
         if temp_station not in self.list_stations:
@@ -56,7 +65,7 @@ class System:
     def returnPredecessors(self, task_name):
         task = self.returnTask(task_name)
         return task.returnPredecessors()
-    
+
     def returnStartingTasks(self):
         return self.list_starting_tasks
 
@@ -72,7 +81,7 @@ class System:
             print("This task belongs to the {} station".format(
                 i.returnOriginStation()))
             print()
-        print("The system's starting tasks are {}".format(self.returnStartingTasks()))
+        print("The system's starting tasks are {}".format(
+            self.returnStartingTasks()))
         print("The system's cycle time is {} unit of time.".format(
             self.returnCycleTime()))
-        
