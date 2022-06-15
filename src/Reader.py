@@ -16,14 +16,12 @@ def createListOfPredecessors(predecessors):
     map_integers = map(int, temp_list)
     list_integers = list(map_integers)
     if len(list_integers) == 1 and list_integers[0] == -1:
-        return []
+        return [], 0
     else:
-        return list_integers
+        return list_integers, len(list_integers)
 
 
-# File must be located in the "testcase" directory and have the "txt" extension
-
-
+# File must be located in the "testcase" directory and have the "csv" extension
 def ReadFile(filename, MainSystem):
     try:
         path_to_folder = os.path.abspath(os.path.join(
@@ -45,11 +43,11 @@ def ReadFile(filename, MainSystem):
                 new_model = Model(task_name, model_name,
                                   human_cost, machine_cost, combo_cost)
                 temp_task.addModel(new_model)
-            predecessor_list = createListOfPredecessors(
-                current_row['predecessor'])
+            predecessor_list, num_of_pred = createListOfPredecessors(current_row['predecessor'])
             initial_solution = current_row['initial_solution']
             originStation = current_row['belongsToStation']
             temp_task.setPredecessors(predecessor_list)
+            temp_task.setNumOfPredecessors(num_of_pred)
             temp_task.setInitialSolution(initial_solution)
             temp_task.setOriginStation(originStation)
             MainSystem.addTask(temp_task)

@@ -4,23 +4,27 @@ class Model:
     # Constructor function
     # TODO: Tambahin Total Cost berdasarkan metode yang dipilih
     def __init__(self, origin_task, model_name, human, machine, combo):
-        self.origin_task = origin_task  # the task that this model belongs to
-        self.model_name = model_name  # the model name i.e. X, Y, Z etc.
-        self.human_cost = human  # the human cost to do the model
-        self.machine_cost = machine  # the machine cost to do the model
-        self.combo_cost = combo  # the combo cost to do the model
+        self.origin_task = origin_task  # integer, pointer to the task that this model belongs to
+        self.model_name = model_name  # char, the model name i.e. X, Y, Z etc.
+        self.human_cost = human  # integer, the human cost to do the model
+        self.machine_cost = machine  # integer, the machine cost to do the model
+        self.combo_cost = combo  # integer, the combo cost to do the model
 
     # Getter functions
-    def returnName(self):
+    def returnModelName(self):
+        # Returns char (string) type as the model name
         return self.model_name
 
     def returnHumanCost(self):
+        # Returns integer as the human cost to do the model
         return self.human_cost
 
     def returnMachineCost(self):
+        # Returns integer as the machine cost to do the model
         return self.machine_cost
 
     def returnComboCost(self):
+        # Returns integer as the HRC cost to do the model
         return self.combo_cost
 
     # Setter functions
