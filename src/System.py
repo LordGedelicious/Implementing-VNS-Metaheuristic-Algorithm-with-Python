@@ -17,6 +17,7 @@ class System:
         self.a_value = 0 # Integer, the a value of the system (localsearch maximum attempts increment/decrement)
 
     def addTask(self, task):
+        starting_tasks = self.returnStartingTasks()
         task_predecessors = task.returnPredecessors()
         if not task_predecessors: # Check empty list
             print("Task {} is a starting task. No predecessors available".format(task.returnTaskName()))
@@ -27,18 +28,26 @@ class System:
                 direct_predecessor = self.returnTask(i)
                 if direct_predecessor is None:
                     sys.exit("Error: Task {} is not in the system. \nPlease fix the csv file".format(task_predecessors[i]))
-                new_predecessors_length += direct_predecessor.returnNumOfPredecessors()
+                if direct_predecessor.returnTaskName() in starting_tasks:
+                    new_predecessors_length += 1
+                else:
+                    new_predecessors_length += len(direct_predecessor.returnPredecessors())
+            new_predecessors_length = max(new_predecessors_length, 1)
             new_predecessors = [[] for i in range(0, new_predecessors_length)]
             print("Predecessors of task {} are {}".format(task.returnTaskName(), task_predecessors))
             print("Length of new predecessors is {}\n".format(new_predecessors_length))
-            current_position = 0
-            while current_position < new_predecessors_length:
-                for i in task_predecessors:
-                    direct_predecessor = self.returnTask(i)
-                    print("Number of predecessors of {} is {}".format(i, direct_predecessor.returnNumOfPredecessors()))
-                    for j in range(0, direct_predecessor.returnNumOfPredecessors()):
-                        new_predecessors[current_position] = direct_predecessor.returnPredecessors()[j]
-                        current_position += 1
+            # TODO: errornya mulai sini
+            added_predecessor = []
+            while [] in new_predecessors:
+                break
+            # while current_position < new_predecessors_length:
+            #     for i in task_predecessors:
+            #         direct_predecessor = self.returnTask(i)
+            #         print("Number of predecessors of {} is {}".format(i, direct_predecessor.returnNumOfPredecessors()))
+            #         for j in range(0, direct_predecessor.returnNumOfPredecessors()):
+            #             new_predecessors[current_position] = direct_predecessor.returnPredecessors()[j]
+            #             current_position += 1
+            #             print(new_predecessors)
         # temp_predecessors = task.returnPredecessors()
         # max_length = len(temp_predecessors) if len(temp_predecessors) > len
         # new_predecessors = [[] for i in range(0, len(temp_predecessors))]
