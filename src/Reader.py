@@ -46,10 +46,14 @@ def ReadFile(filename, MainSystem):
             predecessor_list, num_of_pred = createListOfPredecessors(current_row['predecessor'])
             initial_solution = current_row['initial_solution']
             originStation = current_row['belongsToStation']
+            benefit_R = current_row['benefit_r']
+            benefit_HRC = current_row['benefit_hrc']
             temp_task.setPredecessors(predecessor_list)
             temp_task.setNumOfPredecessors(num_of_pred)
             temp_task.setInitialSolution(initial_solution)
             temp_task.setOriginStation(originStation)
+            temp_task.setBenefitR(benefit_R)
+            temp_task.setBenefitHRC(benefit_HRC)
             MainSystem.addTask(temp_task)
     except Error as err:
         print(err)

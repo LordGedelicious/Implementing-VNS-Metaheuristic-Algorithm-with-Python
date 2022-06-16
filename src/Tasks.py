@@ -13,6 +13,8 @@ class Task:
         self.initial_solution = None
         # Origin Station is a char (string) type, of a single alphabet. Since the limitations are from 25 to 40 tasks and a single station must contain more than one task, 26 letters of the alphabet is sufficient
         self.originStation = None
+        self.benefit_R = 0  # benefit of the task for robot
+        self.benefit_HRC = 0  # benefit of the task for human and robot combo
 
     # Add a model to the task
     # Model will be only added if the maximum number of models is not reached
@@ -38,6 +40,16 @@ class Task:
     # Number of predecessors is the number of direct tasks that is a predecessors of the reference task
     def setNumOfPredecessors(self, num_of_predecessors):
         self.num_of_predecessors = num_of_predecessors
+    
+    # Benefit_R is the benefit cost for using robot to perform the task
+    def setBenefitR(self, benefit_R):
+        # Set the benefit of the task for robot
+        self.benefit_R = benefit_R
+    
+    # Benefit_HRC is the benefit cost for using human and robot to perform the task
+    def setBenefitHRC(self, benefit_HRC):
+        # Set the benefit of the task for human and robot combo
+        self.benefit_HRC = benefit_HRC
     
     # Getter functions
     def returnTaskName(self):
@@ -72,6 +84,14 @@ class Task:
     def returnOriginStation(self):
         # Returns char (string) type as the origin station
         return self.originStation
+    
+    def returnBenefitR(self):
+        # Returns integer as the benefit cost for using robot to perform the task
+        return self.benefit_R
+    
+    def returnBenefitHRC(self):
+        # Returns integer as the benefit cost for using human and robot to perform the task
+        return self.benefit_HRC
 
     def switchStations(self, task_name):
         # Switch station for two tasks

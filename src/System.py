@@ -20,9 +20,10 @@ class System:
         starting_tasks = self.returnStartingTasks()
         task_predecessors = task.returnPredecessors()
         if not task_predecessors: # Check empty list
-            print("Task {} is a starting task. No predecessors available".format(task.returnTaskName()))
             new_predecessors = []
+            new_predecessors_length = 0
         else:
+            new_predecessors = []
             new_predecessors_length = 0
             for i in task_predecessors:
                 direct_predecessor = self.returnTask(i)
@@ -30,35 +31,17 @@ class System:
                     sys.exit("Error: Task {} is not in the system. \nPlease fix the csv file".format(task_predecessors[i]))
                 if direct_predecessor.returnTaskName() in starting_tasks:
                     new_predecessors_length += 1
+                    new_predecessors.append([direct_predecessor.returnTaskName()])
                 else:
+                    for j in direct_predecessor.returnPredecessors():
+                        temp_pred_list = []
+                        if j not in new_predecessors:
+                            for k in j:
+                                temp_pred_list.append(k)
+                            temp_pred_list.append(direct_predecessor.returnTaskName())
+                            new_predecessors.append(temp_pred_list)
                     new_predecessors_length += len(direct_predecessor.returnPredecessors())
             new_predecessors_length = max(new_predecessors_length, 1)
-            new_predecessors = [[] for i in range(0, new_predecessors_length)]
-            print("Predecessors of task {} are {}".format(task.returnTaskName(), task_predecessors))
-            print("Length of new predecessors is {}\n".format(new_predecessors_length))
-            # TODO: errornya mulai sini
-            added_predecessor = []
-            while [] in new_predecessors:
-                break
-            # while current_position < new_predecessors_length:
-            #     for i in task_predecessors:
-            #         direct_predecessor = self.returnTask(i)
-            #         print("Number of predecessors of {} is {}".format(i, direct_predecessor.returnNumOfPredecessors()))
-            #         for j in range(0, direct_predecessor.returnNumOfPredecessors()):
-            #             new_predecessors[current_position] = direct_predecessor.returnPredecessors()[j]
-            #             current_position += 1
-            #             print(new_predecessors)
-        # temp_predecessors = task.returnPredecessors()
-        # max_length = len(temp_predecessors) if len(temp_predecessors) > len
-        # new_predecessors = [[] for i in range(0, len(temp_predecessors))]
-        # for i in range (0, len(temp_predecessors)):
-        #     direct_predecessor = self.returnTask(temp_predecessors[i])
-        #     if direct_predecessor is None:
-        #         sys.exit("Error: Task {} is not in the system. \nPlease fix the csv file".format(temp_predecessors[i]))
-        #     old_predecessors = direct_predecessor.returnPredecessors()
-        #     for j in range(0, len(old_predecessors)):
-        #         new_predecessors[j] = old_predecessors[j]
-        #     new_predecessors[i].append(temp_predecessors[i])
         task.setPredecessors(new_predecessors)
         self.list_task_names.append(task.returnTaskName())
         self.list_tasks.append(task)
@@ -70,9 +53,21 @@ class System:
 
     def setCycleTime(self, cycle_time):
         self.cycle_time = cycle_time
+    
+    def setSValue(self, s_value):
+        self.s_value = s_value
+    
+    def setAValue(self, a_value):
+        self.a_value = a_value
 
     def returnCycleTime(self):
         return self.cycle_time
+    
+    def returnSValue(self):
+        return self.s_value
+    
+    def returnAValue(self):
+        return self.a_value
 
     def returnTaskNames(self):
         list_of_task_names = []
@@ -111,5 +106,9 @@ class System:
             print()
         print("The system's starting tasks are {}".format(
             self.returnStartingTasks()))
+        print("All tasks that are in the system are {}".format(self.returnTaskNames()))
         print("The system's cycle time is {} unit of time.".format(
             self.returnCycleTime()))
+        print("The system's s value is {}".format(self.returnSValue()))
+        print("The system's a value is {}".format(self.returnAValue()))
+        
