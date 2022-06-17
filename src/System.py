@@ -149,4 +149,9 @@ class System:
             self.returnCycleTime()))
         print("The system's s value is {}".format(self.returnSValue()))
         print("The system's a value is {}".format(self.returnAValue()))
+        print("The system's number of products is {}".format(self.returnNumOfProducts()))
+        print("The system's investment cost of human resources is {}".format(self.returnInvestmentCostHuman()))
+        print("The system's investment cost of robot resources is {}".format(self.returnInvestmentCostRobot()))
+        print("The system's operational cost of human resources is {}".format(self.returnOperationalCostHuman()))
+        print("The system's operational cost of robot resources is {}".format(self.returnOperationalCostRobot()))
         
