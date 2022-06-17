@@ -1,9 +1,11 @@
+from itertools import count
 from numpy import integer
 from Tasks import *
 from Models import *
 from Reader import *
 from System import *
 from StartImprovement import *
+from Helper import *
 
 import os
 # other imports
@@ -32,7 +34,12 @@ def main():
         s_value = int(input("Enter the system's s_value: "))
         a_value = int(input("Enter the system's a_value: "))
         if system_cycle_time <= 0 or s_value <= 0 or a_value <= 0:
-            print("Invalid input. Please try again.")
+            print("Invalid input (time and value must be larger than 0 and whole number). Please try again.")
+    main_system.setInvestmentCostHuman(int(input("Enter the investment cost of the human resource: ")))
+    main_system.setInvestmentCostRobot(int(input("Enter the investment cost of the robot resource: ")))
+    main_system.setOperationalCostHuman(int(input("Enter the operational cost of the human resource: ")))
+    main_system.setOperationalCostRobot(int(input("Enter the operational cost of the robot resource: ")))
+    main_system.setNumOfProducts(int(input("Enter the number of products to be produced: ")))
     main_system.setCycleTime(system_cycle_time)
     main_system.setSValue(s_value)
     main_system.setAValue(a_value)

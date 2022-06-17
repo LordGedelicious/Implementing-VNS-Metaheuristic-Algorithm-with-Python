@@ -2,6 +2,7 @@ from numpy import integer
 from Tasks import *
 from Models import *
 from Reader import *
+from Helper import *
 
 import sys
 
@@ -15,6 +16,11 @@ class System:
         self.cycle_time = 0 # Integer, the cycle time of the system
         self.s_value = 0 # Integer, the s value of the system (shaking 1st point maximum attempts)
         self.a_value = 0 # Integer, the a value of the system (localsearch maximum attempts increment/decrement)
+        self.num_of_products = 0 # Integer, the number of products want to be produced by the system
+        self.investment_cost_human = 0 # Integer, the investment cost of the human resources
+        self.investment_cost_robot = 0 # Integer, the investment cost of the robot resources
+        self.operational_cost_human = 0 # Integer, the operational cost of the human resources
+        self.operational_cost_robot = 0 # Integer, the operational cost of the robot resources
 
     def addTask(self, task):
         starting_tasks = self.returnStartingTasks()
@@ -51,6 +57,21 @@ class System:
         if task.returnPredecessors() == []:
             self.list_starting_tasks.append(task.returnTaskName())
 
+    def setInvestmentCostHuman(self, investment_cost_human):
+        self.investment_cost_human = investment_cost_human
+        
+    def setInvestmentCostRobot(self, investment_cost_robot):
+        self.investment_cost_robot = investment_cost_robot
+        
+    def setOperationalCostHuman(self, operational_cost_human):
+        self.operational_cost_human = operational_cost_human
+    
+    def setOperationalCostRobot(self, operational_cost_robot):
+        self.operational_cost_robot = operational_cost_robot
+    
+    def setNumOfProducts(self, num_of_products):
+        self.num_of_products = num_of_products
+    
     def setCycleTime(self, cycle_time):
         self.cycle_time = cycle_time
     
@@ -59,6 +80,21 @@ class System:
     
     def setAValue(self, a_value):
         self.a_value = a_value
+
+    def returnInvestmentCostHuman(self):
+        return self.investment_cost_human
+
+    def returnInvestmentCostRobot(self):
+        return self.investment_cost_robot
+    
+    def returnOperationalCostHuman(self):
+        return self.operational_cost_human
+    
+    def returnOperationalCostRobot(self):
+        return self.operational_cost_robot
+    
+    def returnNumOfProducts(self):
+        return self.num_of_products
 
     def returnCycleTime(self):
         return self.cycle_time
@@ -103,6 +139,8 @@ class System:
                 i.returnInitialSolution()))
             print("This task belongs to the {} station".format(
                 i.returnOriginStation()))
+            print("R-Benefit of this task is {}".format(i.returnBenefitR()))
+            print("HRC-Benefit of this task is {}".format(i.returnBenefitHRC()))
             print()
         print("The system's starting tasks are {}".format(
             self.returnStartingTasks()))
