@@ -1,3 +1,4 @@
+from unittest import result
 from numpy import integer
 from Tasks import *
 from Models import *
@@ -56,6 +57,40 @@ class System:
             self.list_stations.append(temp_station)
         if task.returnPredecessors() == []:
             self.list_starting_tasks.append(task.returnTaskName())
+    
+    # TODO: Make cost counter
+    def countTotalCost(self):
+        total_cost = 0
+        alpha_value = 0
+        rho_value = 0
+        station_list = self.returnStationList()
+        for station in station_list:
+            task_in_current_station = self.returnTaskListByStation(station)
+            isThereHuman = 0
+            isThereRobot = 0
+            for task in task_in_current_station:
+                if isThereHuman == 1 and isThereRobot == 1:
+                    break
+                if self.returnTask(task).returnInitialSolution() in ["H", "HRC"] and isThereHuman == 0:
+                    isThereHuman = 1
+                if self.returnTask(task).returnInitialSolution() in ["R", "HRC"] and isThereRobot == 0:
+                    isThereRobot = 1
+            alpha_value += isThereHuman
+            rho_value += isThereRobot
+        total_cost_cycle_time = self.getCycleTimeForTotalCost()
+        total_cost += alpha_value * self.returnInvestmentCostHuman() + rho_value * self.returnInvestmentCostRobot()
+        total_cost += (alpha_value * self.returnOperationalCostHuman() + rho_value * self.returnOperationalCostRobot()) * total_cost_cycle_time * self.returnNumOfProducts()
+        task_list = self.returnTaskNames()
+        for task_name in task_list:
+            current_task = self.returnTask(task_name)
+            if current_task.returnInitialSolution() == "R":
+                total_cost -= current_task.returnBenefitR()
+            if current_task.returnInitialSolution() == "HRC":
+                total_cost -= current_task.returnBenefitHRC()
+        return total_cost
+    
+    def getCycleTimeForTotalCost(self):
+        pass
 
     def setInvestmentCostHuman(self, investment_cost_human):
         self.investment_cost_human = investment_cost_human
@@ -106,10 +141,7 @@ class System:
         return self.a_value
 
     def returnTaskNames(self):
-        list_of_task_names = []
-        for i in self.list_tasks:
-            list_of_task_names.append(i.returnTaskName())
-        return list_of_task_names
+        return self.list_task_names
 
     def returnTask(self, task_name):
         for i in self.list_tasks:
@@ -118,8 +150,19 @@ class System:
         return None
 
     def returnStationFromTask(self, task_name):
+        # Return the station that corresponds to the task with the task_name
         task = self.returnTask(task_name)
         return task.returnOriginStation()
+    
+    def returnTaskListByStation(self, station_name):
+        # Return list of task names that corresponds to the station with the station_name
+        results = []
+        list_tasks = self.returnTaskNames()
+        for task_name in list_tasks:
+            task = self.returnTask(task_name)
+            if task.returnOriginStation() == station_name:
+                results.append(task_name)
+        return results        
 
     def returnPredecessors(self, task_name):
         task = self.returnTask(task_name)
@@ -127,6 +170,9 @@ class System:
 
     def returnStartingTasks(self):
         return self.list_starting_tasks
+    
+    def returnStationList(self):
+        return self.list_stations
 
     def printContents(self):
         for i in self.list_tasks:
@@ -145,6 +191,7 @@ class System:
         print("The system's starting tasks are {}".format(
             self.returnStartingTasks()))
         print("All tasks that are in the system are {}".format(self.returnTaskNames()))
+        print("All stations that are in the system are {}".format(self.returnStationList()))
         print("The system's cycle time is {} unit of time.".format(
             self.returnCycleTime()))
         print("The system's s value is {}".format(self.returnSValue()))
