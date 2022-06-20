@@ -8,6 +8,7 @@ class Task:
         self.max_models = max_models  # Maximum number of models that can be added to the task
         self.models = []  # Contain models of a single task
         self.num_of_predecessors = 0  # Number of predecessors of the task (before converted to full list)
+        self.direct_predecessors = []  # List of direct predecessors of the task
         self.predecessors = []  # Predecessors is a list type (full list from starting tasks)
         # Initial Solution is a string type, either use "H" for human or "R" for robot or "HRC" for human and robot
         self.initial_solution = None
@@ -28,6 +29,9 @@ class Task:
     # Predecessors are tasks that must be completed before this task can be completed
     def setPredecessors(self, predecessor):
         self.predecessors = predecessor
+        
+    def setDirectPredecessors(self, direct_predecessors):
+        self.direct_predecessors = direct_predecessors
 
     # Initial Solution is a selected method to do all the work in every model for a given task
     def setInitialSolution(self, initial_solution):
@@ -59,6 +63,10 @@ class Task:
     def returnNumOfPredecessors(self):
         # Returns integer as the number of direct predecessors
         return self.num_of_predecessors
+    
+    def returnDirectPredecessors(self):
+        # Returns list of integer as the list of direct predecessor tasks' names
+        return self.direct_predecessors
 
     def returnMaxModels(self):
         # Returns integer as the maximum number of models that can be added to the task

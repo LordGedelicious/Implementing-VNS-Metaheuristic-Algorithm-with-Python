@@ -90,6 +90,13 @@ class System:
         return total_cost
     
     def getCycleTimeForTotalCost(self):
+        station_list = self.returnStationList()
+        for station in station_list:
+            isParalel = []
+            isConsecutive = []
+            task_list = self.returnTaskListByStation(station)
+            for task in task_list:
+                pass
         pass
 
     def setInvestmentCostHuman(self, investment_cost_human):
@@ -180,6 +187,7 @@ class System:
             print("Number of model in task is {}".format(i.returnMaxModels()))
             print("List of models in task:")
             i.printModels()
+            print("Direct predecessors of this task: {}".format(i.returnDirectPredecessors()))
             print("Predecessors of this task: {}".format(i.returnPredecessors()))
             print("From early solution, the task's initial solution is {}".format(
                 i.returnInitialSolution()))

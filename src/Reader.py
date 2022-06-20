@@ -48,6 +48,7 @@ def ReadFile(filename, MainSystem):
             originStation = current_row['belongsToStation']
             benefit_R = current_row['benefit_r']
             benefit_HRC = current_row['benefit_hrc']
+            temp_task.setDirectPredecessors(predecessor_list)
             temp_task.setPredecessors(predecessor_list)
             temp_task.setNumOfPredecessors(num_of_pred)
             temp_task.setInitialSolution(initial_solution)
