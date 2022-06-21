@@ -89,7 +89,7 @@ class System:
             if current_task.returnInitialSolution() == "HRC":
                 total_cost -= current_task.returnBenefitHRC()
         return total_cost
-    
+    # TODO: FIX
     def getCycleTimeForTotalCost(self):
         station_list = self.returnStationList()
         for station in station_list:
@@ -97,6 +97,7 @@ class System:
             isConsecutive = []
             task_list = self.returnTaskListByStation(station)
             task_list.sort(reverse=True)
+            
             for task in task_list:
                 pass
         pass
@@ -201,6 +202,7 @@ class System:
             i.printModels()
             print("Direct predecessors of this task: {}".format(i.returnDirectPredecessors()))
             print("Predecessors of this task: {}".format(i.returnPredecessors()))
+            print("Direct successors of this task: {}".format(i.returnDirectSuccessors()))
             print("From early solution, the task's initial solution is {}".format(
                 i.returnInitialSolution()))
             print("This task belongs to the {} station".format(
@@ -222,4 +224,5 @@ class System:
         print("The system's investment cost of robot resources is {}".format(self.returnInvestmentCostRobot()))
         print("The system's operational cost of human resources is {}".format(self.returnOperationalCostHuman()))
         print("The system's operational cost of robot resources is {}".format(self.returnOperationalCostRobot()))
+        print()
         

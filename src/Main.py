@@ -45,7 +45,7 @@ def main():
     main_system.setInvestmentCostRobot(int(input("Enter the investment cost of the robot resource: ")))
     main_system.setOperationalCostHuman(int(input("Enter the operational cost of the human resource: ")))
     main_system.setOperationalCostRobot(int(input("Enter the operational cost of the robot resource: ")))
-    main_system.setNumOfProducts(int(input("Enter the number of products to be produced: ")))
+    main_system.setNumOfProducts(int(input("Enter the number of products to be produced: \n")))
     main_system.setCycleTime(system_cycle_time)
     main_system.setSValue(s_value)
     main_system.setAValue(a_value)

@@ -9,6 +9,8 @@ class Task:
         self.models = []  # Contain models of a single task
         self.num_of_predecessors = 0  # Number of predecessors of the task (before converted to full list)
         self.direct_predecessors = []  # List of direct predecessors of the task
+        self.num_of_successors = 0  # Number of successors of the task (before converted to full list)
+        self.direct_successors = []  # List of direct successors of the task
         self.predecessors = []  # Predecessors is a list type (full list from starting tasks)
         # Initial Solution is a string type, either use "H" for human or "R" for robot or "HRC" for human and robot
         self.initial_solution = None
@@ -32,6 +34,9 @@ class Task:
         
     def setDirectPredecessors(self, direct_predecessors):
         self.direct_predecessors = direct_predecessors
+    
+    def setDirectSuccessors(self, direct_successors):
+        self.direct_successors = direct_successors
 
     # Initial Solution is a selected method to do all the work in every model for a given task
     def setInitialSolution(self, initial_solution):
@@ -44,6 +49,10 @@ class Task:
     # Number of predecessors is the number of direct tasks that is a predecessors of the reference task
     def setNumOfPredecessors(self, num_of_predecessors):
         self.num_of_predecessors = num_of_predecessors
+        
+    def setNumOfSuccessors(self, num_of_successors):
+        # Set the number of successors of the task
+        self.num_of_successors = num_of_successors
     
     # Benefit_R is the benefit cost for using robot to perform the task
     def setBenefitR(self, benefit_R):
@@ -67,6 +76,10 @@ class Task:
     def returnDirectPredecessors(self):
         # Returns list of integer as the list of direct predecessor tasks' names
         return self.direct_predecessors
+    
+    def returnDirectSuccessors(self):
+        # Returns list of integer as the list of direct successor tasks' names
+        return self.direct_successors
 
     def returnMaxModels(self):
         # Returns integer as the maximum number of models that can be added to the task
