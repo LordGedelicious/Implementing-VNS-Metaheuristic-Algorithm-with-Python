@@ -31,7 +31,7 @@ def ReadFile(filename, MainSystem):
         for i in range(0, df.__len__()):
             current_row = df.iloc[i]
             task_name = current_row['task']
-            num_of_models = current_row['num_models']
+            num_of_models = MainSystem.returnNumOfModels()
             temp_task = Task(task_name, num_of_models)
             for i in range(0, num_of_models):
                 current_count = i + 1

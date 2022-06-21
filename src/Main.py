@@ -6,14 +6,16 @@ from Reader import *
 from System import *
 from StartImprovement import *
 from Helper import *
+from LocalSearch import *
+from StationAllocation import *
+from OperatorSwitch import *
 
 import os
 # other imports
 
 
 def doesFilenameExist(filename):
-    path_to_folder = os.path.abspath(os.path.join(
-        os.path.dirname(__file__), '..', 'testcase'))
+    path_to_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'testcase'))
     path_to_file = os.path.abspath(os.path.join(path_to_folder, filename))
     return os.path.isfile(path_to_file)
 
@@ -25,6 +27,10 @@ def main():
         src_testcase_file = input(
             "Enter the name of the testcase file (include the .csv extension): ")
         bool_FilenameExist = doesFilenameExist(src_testcase_file)
+    num_of_models = 0
+    while num_of_models <= 0:
+        num_of_models = int(input("Input the number of models for each task in the system: "))
+    main_system.setNumOfModels(num_of_models)
     ReadFile(src_testcase_file, main_system)
     system_cycle_time = 0
     s_value = 0

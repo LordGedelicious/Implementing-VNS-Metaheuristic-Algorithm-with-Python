@@ -14,6 +14,7 @@ class System:
         self.list_task_names = [] # List of Task objects' names
         self.list_stations = [] # List of station names in the system
         self.list_starting_tasks = [] # List of starting tasks (Tasks that have no predecessors)
+        self.num_of_models = 0 # Integer, number of models for each task in the system
         self.cycle_time = 0 # Integer, the cycle time of the system
         self.s_value = 0 # Integer, the s value of the system (shaking 1st point maximum attempts)
         self.a_value = 0 # Integer, the a value of the system (localsearch maximum attempts increment/decrement)
@@ -95,9 +96,13 @@ class System:
             isParalel = []
             isConsecutive = []
             task_list = self.returnTaskListByStation(station)
+            task_list.sort(reverse=True)
             for task in task_list:
                 pass
         pass
+
+    def setNumOfModels(self, num_of_models):
+        self.num_of_models = num_of_models
 
     def setInvestmentCostHuman(self, investment_cost_human):
         self.investment_cost_human = investment_cost_human
@@ -137,6 +142,9 @@ class System:
     
     def returnNumOfProducts(self):
         return self.num_of_products
+    
+    def returnNumOfModels(self):
+        return self.num_of_models
 
     def returnCycleTime(self):
         return self.cycle_time
@@ -169,7 +177,11 @@ class System:
             task = self.returnTask(task_name)
             if task.returnOriginStation() == station_name:
                 results.append(task_name)
-        return results        
+        return results     
+    
+    def returnLenStation(self, station):
+        task_list = self.returnTaskListByStation(station)
+        return len(task_list)   
 
     def returnPredecessors(self, task_name):
         task = self.returnTask(task_name)
@@ -196,6 +208,7 @@ class System:
             print("R-Benefit of this task is {}".format(i.returnBenefitR()))
             print("HRC-Benefit of this task is {}".format(i.returnBenefitHRC()))
             print()
+        print()
         print("The system's starting tasks are {}".format(
             self.returnStartingTasks()))
         print("All tasks that are in the system are {}".format(self.returnTaskNames()))
