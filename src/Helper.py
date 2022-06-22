@@ -1,3 +1,4 @@
+from audioop import reverse
 from itertools import count
 from numpy import integer
 from Tasks import *
@@ -43,7 +44,7 @@ def checkIfSameStationRule(system, task_a, task_b):
         return True
     return False
 
-def validSwitchBetweenTwoStationsRule(system, task_a, task_b):
+def singularStationRule(system, task_a, task_b):
     # Check whether task_a and task_b both are from stations that has length of one
     # Returns False if both task are from individual stations
     # Returns True if valid switch between two stations
@@ -55,33 +56,74 @@ def validSwitchBetweenTwoStationsRule(system, task_a, task_b):
         return False
     return True
 
-def checkPrecedenceRule(system, partition):
-    pass
+def checkPrecedenceRule(system, station_name):
+    task_list = system.returnTaskListByStation(station_name)
+    task_list = task_list.sort(reverse=True)
+    for idx in range(len(task_list)):
+        ref_task_name = task_list[idx]
+        ref_task = system.returnTask(ref_task_name)
+        ref_task_pred = ref_task.returnDirectPredecessors()
+        for pred in ref_task_pred:
+            pred_task = system.returnTask(pred)
+            pred_station = pred_task.returnOriginStation()
+            if pred in task_list or isStationAfter(station_name, pred_station):
+                continue
+            return False
+    return True
+            
 
-# For Total Cost's Cycle Time calculation
-def countTotalCostCycleTime(system):
-    max_cycle_time = 0
-    station_list = system.returnStationList()
-    for station in station_list:
-        task_list = system.returnTaskListByStation(station)
-        task_list.sort()
-        temp_storage = [] 
-        # Temp storage is a list of [A,B,C,D,...] with A being the source task 
-        # and B,C,D,... respectively being the H/R/HRC cost for each model in the task
-        for task_name in task_list:
-            direct_pred = system.returnDirectPredecessors(task_name)
-            pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, direct_pred)
-            # If the task is starting task OR (the task has only one predecessor and it's not in the station)
-            if len(direct_pred) == 0 or (len(direct_pred) == 1 and pred_task is None):
+def checkCycleTimeRule(system, station, forRule):
+    # If forRule is True, check whether the station's cycle time is less than the task's cycle time
+    # If forRule is False, returns max time for models in all task in the station
+    # Check whether the cycle time of the tasks in the station is less than the cycle time of the system
+    max_system_cycle_time = system.returnCycleTime()
+    task_list = system.returnTaskListByStation(station)
+    task_list.sort()
+    temp_storage = [] 
+    # Temp storage is a list of [A,B,C,D,...] with A being the source task 
+    # and B,C,D,... respectively being the H/R/HRC cost for each model in the task
+    for task_name in task_list:
+        direct_pred = system.returnDirectPredecessors(task_name)
+        pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, direct_pred)
+        # If the task is starting task OR (the task has only one predecessor and it's not in the station)
+        if len(direct_pred) == 0 or (len(direct_pred) == 1 and pred_task is None):
+            temp_new_list = [task_name]
+            task = system.returnTask(task_name)
+            task_solution = task.returnInitialSolution()
+            temp_new_list += task.isolateModelCosts(task_solution)
+            temp_storage.append(temp_new_list)
+            continue
+        # If the task has only one predecessor and it's on the station (consecutive tasks)
+        elif len(direct_pred) == 1 and pred_task is not None:
+            temp_new_list = pred_task
+            temp_new_list[0] = task_name
+            task = system.returnTask(task_name)
+            task_solution = task.returnInitialSolution()
+            isolated_model_costs = task.isolateModelCosts(task_solution)
+            for idx in range(0, len(isolated_model_costs)):
+                temp_new_list[idx + 1] += temp_new_list[idx]
+            temp_storage.append(temp_new_list)
+            continue
+        # Multiple predecessors for the reference task
+        elif len(direct_pred) > 1:
+            count_existing_pred_in_station = 0
+            store_pred_task = []
+            for pred in direct_pred:
+                pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, pred)
+                if pred_task is not None:
+                    count_existing_pred_in_station += 1
+                    store_pred_task.append(pred_task)
+            # If the task has multiple predecessors and all of them are NOT in the station
+            if count_existing_pred_in_station == 0:
                 temp_new_list = [task_name]
                 task = system.returnTask(task_name)
                 task_solution = task.returnInitialSolution()
                 temp_new_list += task.isolateModelCosts(task_solution)
                 temp_storage.append(temp_new_list)
                 continue
-            # If the task has only one predecessor and it's on the station (consecutive tasks)
-            elif len(direct_pred) == 1 and pred_task is not None:
-                temp_new_list = pred_task
+            # If the task has multiple predecessors and ONLY ONE of them is in the station
+            elif count_existing_pred_in_station == 1:
+                temp_new_list = store_pred_task[0]
                 temp_new_list[0] = task_name
                 task = system.returnTask(task_name)
                 task_solution = task.returnInitialSolution()
@@ -90,52 +132,38 @@ def countTotalCostCycleTime(system):
                     temp_new_list[idx + 1] += temp_new_list[idx]
                 temp_storage.append(temp_new_list)
                 continue
-            # Multiple predecessors for the reference task
-            elif len(direct_pred) > 1:
-                count_existing_pred_in_station = 0
-                store_pred_task = []
-                for pred in direct_pred:
-                    pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, pred)
-                    if pred_task is not None:
-                        count_existing_pred_in_station += 1
-                        store_pred_task.append(pred_task)
-                # If the task has multiple predecessors and all of them are NOT in the station
-                if count_existing_pred_in_station == 0:
-                    temp_new_list = [task_name]
-                    task = system.returnTask(task_name)
-                    task_solution = task.returnInitialSolution()
-                    temp_new_list += task.isolateModelCosts(task_solution)
-                    temp_storage.append(temp_new_list)
-                    continue
-                # If the task has multiple predecessors and ONLY ONE of them is in the station
-                elif count_existing_pred_in_station == 1:
-                    temp_new_list = store_pred_task[0]
-                    temp_new_list[0] = task_name
-                    task = system.returnTask(task_name)
-                    task_solution = task.returnInitialSolution()
-                    isolated_model_costs = task.isolateModelCosts(task_solution)
-                    for idx in range(0, len(isolated_model_costs)):
-                        temp_new_list[idx + 1] += temp_new_list[idx]
-                    temp_storage.append(temp_new_list)
-                    continue
-                # If the task has multiple predecessors and AT LEAST TWO of them are in the station
-                else:
-                    max_cost_models = filterMaxCost(system, store_pred_task)
-                    temp_new_list = [task_name]
-                    temp_new_list += max_cost_models
-                    task = system.returnTask(task_name)
-                    task_solution = task.returnInitialSolution()
-                    isolated_model_costs = task.isolateModelCosts(task_solution)
-                    for idx in range(0, len(max_cost_models)):
-                        temp_new_list[idx + 1] += isolated_model_costs[idx]
-                    temp_storage.append(temp_new_list)
-                    continue
-        # Calculate the total cycle time for the station
-        final_cost = [0 for i in range(system.returnNumOfModels())]
-        for stored_arr in temp_storage:
-            stored_arr = stored_arr[1:]
-            for idx in range(0, len(stored_arr)):
-                final_cost[idx] += stored_arr[idx]
+            # If the task has multiple predecessors and AT LEAST TWO of them are in the station
+            else:
+                max_cost_models = filterMaxCost(system, store_pred_task)
+                temp_new_list = [task_name]
+                temp_new_list += max_cost_models
+                task = system.returnTask(task_name)
+                task_solution = task.returnInitialSolution()
+                isolated_model_costs = task.isolateModelCosts(task_solution)
+                for idx in range(0, len(max_cost_models)):
+                    temp_new_list[idx + 1] += isolated_model_costs[idx]
+                temp_storage.append(temp_new_list)
+                continue
+    # Calculate the total cycle time for the station
+    final_cost = [0 for i in range(system.returnNumOfModels())]
+    for stored_arr in temp_storage:
+        stored_arr = stored_arr[1:]
+        for idx in range(0, len(stored_arr)):
+            final_cost[idx] += stored_arr[idx]
+    if forRule:
+        for cost in final_cost:
+            if cost > max_system_cycle_time:
+                return False
+        return True
+    else:
+        return final_cost
+
+# For Total Cost's Cycle Time calculation
+def countTotalCostCycleTime(system):
+    max_cycle_time = 0
+    station_list = system.returnStationList()
+    for station in station_list:
+        final_cost = checkCycleTimeRule(system, station, False)
         max_cycle_time = max(max_cycle_time, max(final_cost))
     return max_cycle_time
             

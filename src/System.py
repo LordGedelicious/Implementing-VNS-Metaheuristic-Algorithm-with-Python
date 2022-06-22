@@ -78,7 +78,7 @@ class System:
                     isThereRobot = 1
             alpha_value += isThereHuman
             rho_value += isThereRobot
-        total_cost_cycle_time = self.getCycleTimeForTotalCost()
+        total_cost_cycle_time = countTotalCostCycleTime(self)
         total_cost += alpha_value * self.returnInvestmentCostHuman() + rho_value * self.returnInvestmentCostRobot()
         total_cost += (alpha_value * self.returnOperationalCostHuman() + rho_value * self.returnOperationalCostRobot()) * total_cost_cycle_time * self.returnNumOfProducts()
         task_list = self.returnTaskNames()
@@ -89,18 +89,6 @@ class System:
             if current_task.returnInitialSolution() == "HRC":
                 total_cost -= current_task.returnBenefitHRC()
         return total_cost
-    # TODO: FIX
-    def getCycleTimeForTotalCost(self):
-        station_list = self.returnStationList()
-        for station in station_list:
-            isParalel = []
-            isConsecutive = []
-            task_list = self.returnTaskListByStation(station)
-            task_list.sort(reverse=True)
-            
-            for task in task_list:
-                pass
-        pass
 
     def setNumOfModels(self, num_of_models):
         self.num_of_models = num_of_models
