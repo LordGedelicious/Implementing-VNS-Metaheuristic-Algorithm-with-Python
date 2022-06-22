@@ -81,6 +81,10 @@ class Task:
         # Returns list of integer as the list of direct successor tasks' names
         return self.direct_successors
 
+    def returnNumOfSuccessors(self):
+        # Returns integer as the number of direct successors
+        return self.num_of_successors
+
     def returnMaxModels(self):
         # Returns integer as the maximum number of models that can be added to the task
         return self.max_models
@@ -93,6 +97,9 @@ class Task:
                     return i
         except:
             print("Error: Model " + model_name + " does not exist.")
+    
+    def returnAllModels(self):
+        return self.models
 
     def returnPredecessors(self):
         # Returns list of integer as the list of predecessor tasks' names
@@ -127,3 +134,12 @@ class Task:
             print("Model's human cost is {}".format(i.returnHumanCost()))
             print("Model's machine cost is {}".format(i.returnMachineCost()))
             print("Model's hrc cost is {}".format(i.returnComboCost()))
+    
+    def isolateModelCosts(self, initial_solution):
+        # Isolate the model costs from the task's models
+        model_costs = []
+        for model in self.returnAllModels():
+            model_costs.append(model.returnHumanCost()) if initial_solution == 'H' else None
+            model_costs.append(model.returnRobotCost()) if initial_solution == 'R' else None
+            model_costs.append(model.returnComboCost()) if initial_solution == 'HRC' else None
+        return model_costs
