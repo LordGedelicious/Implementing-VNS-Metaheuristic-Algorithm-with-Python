@@ -155,10 +155,7 @@ def checkCycleTimeRule(system, station, forRule):
                 continue
     # Calculate the total cycle time for the station
     final_cost = [0 for i in range(system.returnNumOfModels())]
-    for stored_arr in temp_storage:
-        stored_arr = stored_arr[1:]
-        for idx in range(0, len(stored_arr)):
-            final_cost[idx] += stored_arr[idx]
+    final_cost = filterMaxCost(system, temp_storage)
     if forRule:
         for cost in final_cost:
             if cost > max_system_cycle_time:
@@ -203,9 +200,9 @@ def filterMaxCost(system, pred_task_list):
             human_pred_task_list.append(pred_task[1:])
         elif task.returnInitialSolution() == "R":
             robot_pred_task_list.append(pred_task[1:])
-    robot_pred_task_list = filterMaxCostPerSolution(robot_pred_task_list)
-    human_pred_task_list = filterMaxCostPerSolution(human_pred_task_list)
-    hrc_pred_task_list = filterMaxCostPerSolution(hrc_pred_task_list)
+    robot_pred_task_list = filterMaxCostPerSolution(robot_pred_task_list) if len(robot_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    human_pred_task_list = filterMaxCostPerSolution(human_pred_task_list) if len(human_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    hrc_pred_task_list = filterMaxCostPerSolution(hrc_pred_task_list) if len(hrc_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
     if can_parallel:
         robot_compare_human = []
         robot_compare_human.append(robot_pred_task_list)
