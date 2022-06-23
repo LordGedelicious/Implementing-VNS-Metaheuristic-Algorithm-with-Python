@@ -51,6 +51,7 @@ def main():
     main_system.setSValue(s_value)
     main_system.setAValue(a_value)
     main_system.printContents()
+    print("The initial total cost of the system is {}".format(main_system.countTotalCost()))
     StartImprovement(main_system)
 
 

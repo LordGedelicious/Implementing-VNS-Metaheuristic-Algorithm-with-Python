@@ -5,8 +5,6 @@ from Tasks import *
 from Models import *
 from Reader import *
 from System import *
-from StartImprovement import *
-from Shaking import *
 
 
 def sortStationOrder(system):
@@ -70,7 +68,11 @@ def checkPrecedenceRule(system, station_name):
                 continue
             return False
     return True
-            
+
+def compareCosts(original_cost, new_cost):
+    # Returns True if new_cost is less than original_cost
+    pass
+
 
 def checkCycleTimeRule(system, station, forRule):
     # If forRule is True, check whether the station's cycle time is less than the task's cycle time
@@ -83,7 +85,9 @@ def checkCycleTimeRule(system, station, forRule):
     # Temp storage is a list of [A,B,C,D,...] with A being the source task 
     # and B,C,D,... respectively being the H/R/HRC cost for each model in the task
     for task_name in task_list:
-        direct_pred = system.returnDirectPredecessors(task_name)
+        task = system.returnTask(task_name)
+        direct_pred = task.returnDirectPredecessors()
+        print("Task {} has direct predecessors {}".format(task_name, direct_pred))
         pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, direct_pred)
         # If the task is starting task OR (the task has only one predecessor and it's not in the station)
         if len(direct_pred) == 0 or (len(direct_pred) == 1 and pred_task is None):
@@ -91,6 +95,7 @@ def checkCycleTimeRule(system, station, forRule):
             task = system.returnTask(task_name)
             task_solution = task.returnInitialSolution()
             temp_new_list += task.isolateModelCosts(task_solution)
+            print("The added list is {}".format(temp_new_list))
             temp_storage.append(temp_new_list)
             continue
         # If the task has only one predecessor and it's on the station (consecutive tasks)
@@ -101,7 +106,8 @@ def checkCycleTimeRule(system, station, forRule):
             task_solution = task.returnInitialSolution()
             isolated_model_costs = task.isolateModelCosts(task_solution)
             for idx in range(0, len(isolated_model_costs)):
-                temp_new_list[idx + 1] += temp_new_list[idx]
+                temp_new_list[idx + 1] += isolated_model_costs[idx]
+            print("The added list is {}".format(temp_new_list))
             temp_storage.append(temp_new_list)
             continue
         # Multiple predecessors for the reference task
@@ -119,6 +125,7 @@ def checkCycleTimeRule(system, station, forRule):
                 task = system.returnTask(task_name)
                 task_solution = task.returnInitialSolution()
                 temp_new_list += task.isolateModelCosts(task_solution)
+                print("The added list is {}".format(temp_new_list))
                 temp_storage.append(temp_new_list)
                 continue
             # If the task has multiple predecessors and ONLY ONE of them is in the station
@@ -129,7 +136,8 @@ def checkCycleTimeRule(system, station, forRule):
                 task_solution = task.returnInitialSolution()
                 isolated_model_costs = task.isolateModelCosts(task_solution)
                 for idx in range(0, len(isolated_model_costs)):
-                    temp_new_list[idx + 1] += temp_new_list[idx]
+                    temp_new_list[idx + 1] += isolated_model_costs[idx]
+                print("The added list is {}".format(temp_new_list))
                 temp_storage.append(temp_new_list)
                 continue
             # If the task has multiple predecessors and AT LEAST TWO of them are in the station
@@ -142,6 +150,7 @@ def checkCycleTimeRule(system, station, forRule):
                 isolated_model_costs = task.isolateModelCosts(task_solution)
                 for idx in range(0, len(max_cost_models)):
                     temp_new_list[idx + 1] += isolated_model_costs[idx]
+                print("The added list is {}".format(temp_new_list))
                 temp_storage.append(temp_new_list)
                 continue
     # Calculate the total cycle time for the station
@@ -164,7 +173,9 @@ def countTotalCostCycleTime(system):
     station_list = system.returnStationList()
     for station in station_list:
         final_cost = checkCycleTimeRule(system, station, False)
+        print("For station {} the final cost is {}".format(station, final_cost))
         max_cycle_time = max(max_cycle_time, max(final_cost))
+    print("The max cycle time is {}".format(max_cycle_time))
     return max_cycle_time
             
             

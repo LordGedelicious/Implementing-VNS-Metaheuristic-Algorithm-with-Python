@@ -59,7 +59,6 @@ class System:
         if task.returnPredecessors() == []:
             self.list_starting_tasks.append(task.returnTaskName())
     
-    # TODO: Make cost counter
     def countTotalCost(self):
         total_cost = 0
         alpha_value = 0
@@ -89,6 +88,12 @@ class System:
             if current_task.returnInitialSolution() == "HRC":
                 total_cost -= current_task.returnBenefitHRC()
         return total_cost
+    
+    def switchStationsOfTwoTasks(self, task_1, task_2):
+        temp_station_1 = task_1.returnOriginStation()
+        temp_station_2 = task_2.returnOriginStation()
+        task_1.setOriginStation(temp_station_2)
+        task_2.setOriginStation(temp_station_1)
 
     def setNumOfModels(self, num_of_models):
         self.num_of_models = num_of_models

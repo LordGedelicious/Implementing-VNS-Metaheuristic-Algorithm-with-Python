@@ -140,6 +140,6 @@ class Task:
         model_costs = []
         for model in self.returnAllModels():
             model_costs.append(model.returnHumanCost()) if initial_solution == 'H' else None
-            model_costs.append(model.returnRobotCost()) if initial_solution == 'R' else None
+            model_costs.append(model.returnMachineCost()) if initial_solution == 'R' else None
             model_costs.append(model.returnComboCost()) if initial_solution == 'HRC' else None
         return model_costs
