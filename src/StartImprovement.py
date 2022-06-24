@@ -3,6 +3,7 @@ from Tasks import *
 from Models import *
 from Reader import *
 from System import *
+from Shaking import *
 
 
 def checkKValueContents(system, partitions, k_value):
@@ -31,12 +32,11 @@ def StartImprovement(system):
     isPartitionComplete = False
     while not isPartitionComplete:
         try:
-            list_of_partitionable_tasks = system.returnTaskNames()
+            list_of_partitionable_tasks = copy.deepcopy(system.returnTaskNames())
             print(list_of_partitionable_tasks)
             partitions = [[] for i in range(0, k_value + 1)]
             for i in range(0, k_value):
-                partition_contents = input(
-                    "Insert contents for partition {} :".format(i+1))
+                partition_contents = input("Insert contents for partition {} :".format(i+1))
                 for j in partition_contents.split():
                     val_j = int(j)
                     list_of_partitionable_tasks.remove(val_j)
@@ -52,3 +52,7 @@ def StartImprovement(system):
     print("Current State of Partitions:")
     for i in range(0, k_value + 1):
         print(partitions[i])
+    for partition in partitions:
+        print("Current partition: {}".format(partition))
+        print("Current tasks in system: {}".format(system.returnTaskNames()))
+        startShaking(system, partition)
