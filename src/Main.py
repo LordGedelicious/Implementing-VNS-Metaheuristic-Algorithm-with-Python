@@ -52,7 +52,9 @@ def main():
     main_system.setAValue(a_value)
     main_system.printContents()
     print("The initial total cost of the system is {}".format(main_system.countTotalCost()))
-    StartImprovement(main_system)
-
+    partitions = StartImprovement(main_system)
+    for partition in partitions:
+        print("Partition: {}".format(partition))
+        startShaking(main_system, partition)
 
 main()

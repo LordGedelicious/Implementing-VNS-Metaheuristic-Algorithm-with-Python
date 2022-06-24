@@ -5,6 +5,7 @@ from Reader import *
 from System import *
 from Shaking import *
 
+import copy
 
 def checkKValueContents(system, partitions, k_value):
     # Check if every partition of the system has tasks from at least two different stations
@@ -52,7 +53,5 @@ def StartImprovement(system):
     print("Current State of Partitions:")
     for i in range(0, k_value + 1):
         print(partitions[i])
-    for partition in partitions:
-        print("Current partition: {}".format(partition))
-        print("Current tasks in system: {}".format(system.returnTaskNames()))
-        startShaking(system, partition)
+    print()
+    return partitions

@@ -1,4 +1,5 @@
 from itertools import count
+from random import random
 from numpy import integer
 from Tasks import *
 from Models import *
@@ -6,72 +7,82 @@ from Reader import *
 from System import *
 from StartImprovement import *
 from Helper import *
+from LocalSearch import *
 
 import copy
+import random
 
-
-# def sortPredecessorsListBasedOnPredecessorsLength(system, partition):
-#     # Using bubble sort to sort the predecessors list based on the length of the predecessors list descendingly
-#     new_list = copy.deepcopy(partition)
-#     while True:
-#         count_swaps = 0
-#         for i in range(len(new_list) - 1):
-#             if len(system.returnPredecessors(new_list[i])) < len(system.returnPredecessors(new_list[i + 1])):
-#                 new_list[i], new_list[i + 1] = new_list[i + 1], new_list[i]
-#                 count_swaps += 1
-#         if count_swaps == 0:
-#             break
-#     return new_list
-
-def checkIfSameStationRule(system, task_a, task_b):
-    # Return True if the two tasks are from the same station
-    if system.returnStationFromTask(task_a) == system.returnStationFromTask(task_b):
-        return True
-    return False
-
-def checkPrecedenceRule(system, partition):
-    pass
-
-# def checkIfPrecedenceRule(system, partition):
-#     starting_tasks = system.returnStartingTasks()
-#     base_tasks = []
-#     bool_first_checking = True
-#     for i in partition:
-#         if system.returnStationFromTask(i) == []:
-#             continue
-#         elif len(system.returnPredecessors(i)) == 1 and system.returnPredecessors(i)[0] in starting_tasks:
-#             continue
-#         else:
-#             bool_first_checking = False
-#             break
-#     if not bool_first_checking:
-#         bool_second_checking = True
-#         # Sort is based on the length of the predecessors list
-#         sorted_partition = sortPredecessorsListBasedOnPredecessorsLength(
-#             system, partition)
-#         for i in range(0, len(sorted_partition)):
-#             for j in range(len(sorted_partition) - 1, j, -1):
-#                 if j in system.returnPredecessors(i):
-#                     continue
-#                 else:
-#                     bool_second_checking = False
-#                     break
-#         if not bool_second_checking:
-#             bool_third_checking = True
-#             for i in partition:
-#                 for j in system.returnPredecessors(i):
-#                     if j in starting_tasks:
-#                         bool_third_checking = True
-#                         break
-#                     else:
-#                         bool_third_checking = False
-#                         continue
-#             if not bool_third_checking:
-#                 # TODO: Cek kalau gabungan aturan aturan di atas
-#                 pass
-#     return True
-
+def getStationListFromPartitions(system, partitions):
+    station_list = []
+    for task_name in partitions:
+        task = system.returnTask(task_name)
+        task_station = task.returnOriginStation()
+        if task_station not in station_list:
+            station_list.append(task_station)
+    return station_list
 
 def startShaking(system, partitions):
-    for i in partitions:
-        print(i)
+    s_value = system.returnSValue()
+    station_list = system.returnStationList()
+    initial_system_cost = copy.deepcopy(system.countTotalCost())
+    tested_tasks = []
+    shakingSuccess = False
+    final_first_point = None
+    final_second_point = None
+    while s_value > 0:
+        first_point = random.choice(partitions)
+        print("Current attempted first point: {}".format(first_point))
+        while first_point in tested_tasks:
+            first_point = random.choice(partitions)
+        tested_tasks.append(first_point)
+        for possible_task in partitions:
+            print("Current attempted second point: {}".format(possible_task))
+            if possible_task == first_point:
+                print("First point and second point is the same. Invalid.")
+                continue
+            first_point_task = system.returnTask(first_point)
+            second_point_task = system.returnTask(possible_task)
+            system.switchStationsOfTwoTasks(first_point_task, second_point_task)
+            passAllRule = True
+            for station in station_list:
+                if not checkPrecedenceRule(system, station):
+                    print("Switch between first_point and possible_task failed because violation of Precedence Rule.")
+                    passAllRule = False
+                    break
+                if not checkCycleTimeRule(system, station, True):
+                    print(checkCycleTimeRule(system, station, False))
+                    print("Switch between first_point and possible_task failed because violation of Cycle Time Rule.")
+                    passAllRule = False
+                    break
+            if not singularStationRule(system, first_point, possible_task):
+                print("Switch between first_point and possible_task failed because violation of Singular Station Rule.")
+                passAllRule = False
+            if checkIfSameStationRule(system, first_point, possible_task):
+                print("Switch between first_point and possible_task failed because both tasks are from the same station.")
+                passAllRule = False
+            if not passAllRule:
+                system.switchStationsOfTwoTasks(first_point_task, second_point_task)
+                continue
+            else:
+                # Set s_value to 0 to stop the loop
+                s_value = 0
+                shakingSuccess = True
+                final_first_point = first_point
+                final_second_point = possible_task
+                new_system_cost = copy.deepcopy(system.countTotalCost())
+                # system.switchStationsOfTwoTasks(first_point_task, second_point_task)
+                break
+        if shakingSuccess:
+            print("Successful shaking by switching {} and {}!".format(final_first_point, final_second_point))
+            system = LocalSearch(system, final_first_point, final_second_point, new_system_cost)
+            break
+        else:
+            print("Shaking failed.\n")
+            s_value -= 1
+    # TODO: Do operator switching
+    
+                
+                
+                
+                
+        
