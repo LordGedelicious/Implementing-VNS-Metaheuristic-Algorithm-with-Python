@@ -36,7 +36,7 @@ class System:
             for i in task_predecessors:
                 direct_predecessor = self.returnTask(i)
                 if direct_predecessor is None:
-                    sys.exit("Error: Task {} is not in the system. \nPlease fix the csv file".format(task_predecessors[i]))
+                    sys.exit("Error: Task {} is not in the system. \nPlease fix the csv file".format(i))
                 if direct_predecessor.returnTaskName() in starting_tasks:
                     new_predecessors_length += 1
                     new_predecessors.append([direct_predecessor.returnTaskName()])
@@ -167,6 +167,7 @@ class System:
         # Return list of task names that corresponds to the station with the station_name
         results = []
         list_tasks = self.returnTaskNames()
+        # print("List tasks in system: {}".format(list_tasks))
         for task_name in list_tasks:
             task = self.returnTask(task_name)
             if task.returnOriginStation() == station_name:
