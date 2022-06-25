@@ -42,6 +42,11 @@ def checkIfSameStationRule(system, task_name_a, task_name_b):
         return True
     return False
 
+def checkIfSameStation(system, task_name_a, station_name):
+    if system.returnStationFromTask(task_name_a) == station_name:
+        return True
+    return False
+
 def singularStationRule(system, task_name_a, task_name_b):
     # Check whether task_a and task_b both are from stations that has length of one
     # Returns False if both task are from individual stations
