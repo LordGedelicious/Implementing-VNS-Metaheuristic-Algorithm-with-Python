@@ -55,7 +55,7 @@ def main():
     partitions = StartImprovement(main_system)
     for partition in partitions:
         ref_system = main_system
-        changed_system = copy.deepcopy(main_system)
+        changed_system = copy.deepcopy(ref_system)
         print("Partition: {}".format(partition))
         changed_system = startShaking(changed_system, partition)
         haltProgress()

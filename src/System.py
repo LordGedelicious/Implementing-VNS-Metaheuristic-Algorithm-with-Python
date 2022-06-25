@@ -130,6 +130,9 @@ class System:
     
     def setAValue(self, a_value):
         self.a_value = a_value
+        
+    def setStationList(self, station_list):
+        self.station_list = station_list
 
     def returnInvestmentCostHuman(self):
         return self.investment_cost_human
