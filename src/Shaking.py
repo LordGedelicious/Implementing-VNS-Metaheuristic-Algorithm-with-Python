@@ -31,10 +31,10 @@ def startShaking(system, partitions):
     final_second_point = None
     while s_value > 0:
         first_point = random.choice(partitions)
-        print("Current attempted first point: {}".format(first_point))
         while first_point in tested_tasks:
             first_point = random.choice(partitions)
         tested_tasks.append(first_point)
+        print("Current attempted first point: {}".format(first_point))
         for possible_task in partitions:
             print("Current attempted second point: {}".format(possible_task))
             if possible_task == first_point:
@@ -50,7 +50,7 @@ def startShaking(system, partitions):
                     passAllRule = False
                     break
                 if not checkCycleTimeRule(system, station, True):
-                    print(checkCycleTimeRule(system, station, False))
+                    # print(checkCycleTimeRule(system, station, False))
                     print("Switch between first_point and possible_task failed because violation of Cycle Time Rule.")
                     passAllRule = False
                     break
@@ -70,7 +70,7 @@ def startShaking(system, partitions):
                 final_first_point = first_point
                 final_second_point = possible_task
                 new_system_cost = copy.deepcopy(system.countTotalCost())
-                # system.switchStationsOfTwoTasks(first_point_task, second_point_task)
+                system.switchStationsOfTwoTasks(first_point_task, second_point_task)
                 break
         if shakingSuccess:
             print("Successful shaking by switching {} and {}!".format(final_first_point, final_second_point))
@@ -79,7 +79,7 @@ def startShaking(system, partitions):
         else:
             print("Shaking failed.\n")
             s_value -= 1
-    # TODO: Do operator switching
+    return system
     
                 
                 
