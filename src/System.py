@@ -81,12 +81,21 @@ class System:
         total_cost += alpha_value * self.returnInvestmentCostHuman() + rho_value * self.returnInvestmentCostRobot()
         total_cost += (alpha_value * self.returnOperationalCostHuman() + rho_value * self.returnOperationalCostRobot()) * total_cost_cycle_time * self.returnNumOfProducts()
         task_list = self.returnTaskNames()
+        deduction_benefit_r = 0
+        deduction_benefit_hrc = 0
         for task_name in task_list:
             current_task = self.returnTask(task_name)
             if current_task.returnInitialSolution() == "R":
                 total_cost -= current_task.returnBenefitR()
+                deduction_benefit_r += current_task.returnBenefitR()
             if current_task.returnInitialSolution() == "HRC":
                 total_cost -= current_task.returnBenefitHRC()
+                deduction_benefit_hrc += current_task.returnBenefitHRC()
+        # print("Total cost: {}".format(total_cost))
+        # print("Alpha value: {}".format(alpha_value))
+        # print("Rho value: {}".format(rho_value))
+        # print("Deduction benefit R: {}".format(deduction_benefit_r))
+        # print("Deduction benefit HRC: {}".format(deduction_benefit_hrc))
         return total_cost
     
     def switchStationsOfTwoTasks(self, task_1, task_2):

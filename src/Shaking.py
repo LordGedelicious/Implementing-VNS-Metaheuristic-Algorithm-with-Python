@@ -74,6 +74,7 @@ def startShaking(system, partitions):
                 break
         if shakingSuccess:
             print("Successful shaking by switching {} and {}!".format(final_first_point, final_second_point))
+            haltProgress()
             system = LocalSearch(system, final_first_point, final_second_point, new_system_cost)
             break
         else:

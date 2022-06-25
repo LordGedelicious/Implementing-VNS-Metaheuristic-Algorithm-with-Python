@@ -19,7 +19,6 @@ def doesFilenameExist(filename):
     path_to_file = os.path.abspath(os.path.join(path_to_folder, filename))
     return os.path.isfile(path_to_file)
 
-
 def main():
     main_system = System()
     bool_FilenameExist = False
@@ -52,9 +51,15 @@ def main():
     main_system.setAValue(a_value)
     main_system.printContents()
     print("The initial total cost of the system is {}".format(main_system.countTotalCost()))
+    haltProgress()
     partitions = StartImprovement(main_system)
     for partition in partitions:
+        ref_system = main_system
+        changed_system = copy.deepcopy(main_system)
         print("Partition: {}".format(partition))
-        startShaking(main_system, partition)
-
+        changed_system = startShaking(changed_system, partition)
+        haltProgress()
+        changed_system = startOperatorSwitch(changed_system, partition)
+        haltProgress()
+        break
 main()
