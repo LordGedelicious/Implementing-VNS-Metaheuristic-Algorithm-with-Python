@@ -36,18 +36,18 @@ def isStationAfter(station_1, station_2):
         return station_1 > station_2
     
 # For rules' implementations
-def checkIfSameStationRule(system, task_a, task_b):
+def checkIfSameStationRule(system, task_name_a, task_name_b):
     # Return True if the two tasks are from the same station
-    if system.returnStationFromTask(task_a) == system.returnStationFromTask(task_b):
+    if system.returnStationFromTask(task_name_a) == system.returnStationFromTask(task_name_b):
         return True
     return False
 
-def singularStationRule(system, task_a, task_b):
+def singularStationRule(system, task_name_a, task_name_b):
     # Check whether task_a and task_b both are from stations that has length of one
     # Returns False if both task are from individual stations
     # Returns True if valid switch between two stations
-    station_a = system.returnStationFromTask(task_a)
-    station_b = system.returnStationFromTask(task_b)
+    station_a = system.returnStationFromTask(task_name_a)
+    station_b = system.returnStationFromTask(task_name_b)
     len_station_a = system.returnLenStation(station_a)
     len_station_b = system.returnLenStation(station_b)
     if len_station_a == 1 and len_station_b == 1:
@@ -56,7 +56,7 @@ def singularStationRule(system, task_a, task_b):
 
 def checkPrecedenceRule(system, station_name):
     task_list = system.returnTaskListByStation(station_name)
-    task_list = task_list.sort(reverse=True)
+    task_list.sort(reverse=True)
     for idx in range(len(task_list)):
         ref_task_name = task_list[idx]
         ref_task = system.returnTask(ref_task_name)
@@ -68,11 +68,6 @@ def checkPrecedenceRule(system, station_name):
                 continue
             return False
     return True
-
-def compareCosts(original_cost, new_cost):
-    # Returns True if new_cost is less than original_cost
-    pass
-
 
 def checkCycleTimeRule(system, station, forRule):
     # If forRule is True, check whether the station's cycle time is less than the task's cycle time
@@ -87,15 +82,18 @@ def checkCycleTimeRule(system, station, forRule):
     for task_name in task_list:
         task = system.returnTask(task_name)
         direct_pred = task.returnDirectPredecessors()
-        print("Task {} has direct predecessors {}".format(task_name, direct_pred))
-        pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, direct_pred)
+        # print("Task {} has direct predecessors {}".format(task_name, direct_pred))
+        if len(direct_pred) in [0,1]:
+            pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, direct_pred)
+        else:
+            pred_task = None
         # If the task is starting task OR (the task has only one predecessor and it's not in the station)
         if len(direct_pred) == 0 or (len(direct_pred) == 1 and pred_task is None):
             temp_new_list = [task_name]
             task = system.returnTask(task_name)
             task_solution = task.returnInitialSolution()
             temp_new_list += task.isolateModelCosts(task_solution)
-            print("The added list is {}".format(temp_new_list))
+            # print("The added list is {}".format(temp_new_list))
             temp_storage.append(temp_new_list)
             continue
         # If the task has only one predecessor and it's on the station (consecutive tasks)
@@ -107,7 +105,7 @@ def checkCycleTimeRule(system, station, forRule):
             isolated_model_costs = task.isolateModelCosts(task_solution)
             for idx in range(0, len(isolated_model_costs)):
                 temp_new_list[idx + 1] += isolated_model_costs[idx]
-            print("The added list is {}".format(temp_new_list))
+            # print("The added list is {}".format(temp_new_list))
             temp_storage.append(temp_new_list)
             continue
         # Multiple predecessors for the reference task
@@ -125,7 +123,7 @@ def checkCycleTimeRule(system, station, forRule):
                 task = system.returnTask(task_name)
                 task_solution = task.returnInitialSolution()
                 temp_new_list += task.isolateModelCosts(task_solution)
-                print("The added list is {}".format(temp_new_list))
+                # print("The added list is {}".format(temp_new_list))
                 temp_storage.append(temp_new_list)
                 continue
             # If the task has multiple predecessors and ONLY ONE of them is in the station
@@ -137,7 +135,7 @@ def checkCycleTimeRule(system, station, forRule):
                 isolated_model_costs = task.isolateModelCosts(task_solution)
                 for idx in range(0, len(isolated_model_costs)):
                     temp_new_list[idx + 1] += isolated_model_costs[idx]
-                print("The added list is {}".format(temp_new_list))
+                # print("The added list is {}".format(temp_new_list))
                 temp_storage.append(temp_new_list)
                 continue
             # If the task has multiple predecessors and AT LEAST TWO of them are in the station
@@ -150,11 +148,12 @@ def checkCycleTimeRule(system, station, forRule):
                 isolated_model_costs = task.isolateModelCosts(task_solution)
                 for idx in range(0, len(max_cost_models)):
                     temp_new_list[idx + 1] += isolated_model_costs[idx]
-                print("The added list is {}".format(temp_new_list))
+                # print("The added list is {}".format(temp_new_list))
                 temp_storage.append(temp_new_list)
                 continue
     # Calculate the total cycle time for the station
     final_cost = [0 for i in range(system.returnNumOfModels())]
+    # print("For station {}, the temp_storage is {}".format(station, temp_storage))
     final_cost = filterMaxCost(system, temp_storage)
     if forRule:
         for cost in final_cost:
@@ -179,6 +178,8 @@ def countTotalCostCycleTime(system):
 def whereIsPredInTempStorage(temp_storage, pred):
     # Returns the index of the predecessor in the temp_storage with the costs
     for lists in temp_storage:
+        # print(lists)
+        # print(pred)
         if lists[0] == pred:
             idx = temp_storage.index(lists)
             return temp_storage.pop(idx), temp_storage
@@ -200,9 +201,13 @@ def filterMaxCost(system, pred_task_list):
             human_pred_task_list.append(pred_task[1:])
         elif task.returnInitialSolution() == "R":
             robot_pred_task_list.append(pred_task[1:])
-    robot_pred_task_list = filterMaxCostPerSolution(robot_pred_task_list) if len(robot_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
-    human_pred_task_list = filterMaxCostPerSolution(human_pred_task_list) if len(human_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
-    hrc_pred_task_list = filterMaxCostPerSolution(hrc_pred_task_list) if len(hrc_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    robot_pred_task_list = nonparallelCostCountPerSolution(robot_pred_task_list) if len(robot_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    human_pred_task_list = nonparallelCostCountPerSolution(human_pred_task_list) if len(human_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    hrc_pred_task_list = nonparallelCostCountPerSolution(hrc_pred_task_list) if len(hrc_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    # print("The robot_pred_task_list is {}".format(robot_pred_task_list))
+    # print("The human_pred_task_list is {}".format(human_pred_task_list))
+    # print("The hrc_pred_task_list is {}".format(hrc_pred_task_list))
+    # print("Can it parallel? {}".format(can_parallel))
     if can_parallel:
         robot_compare_human = []
         robot_compare_human.append(robot_pred_task_list)
@@ -222,3 +227,10 @@ def filterMaxCostPerSolution(pred_task_list):
     for model in temp_store_all_costs:
         max_cost_models.append(max(model))
     return max_cost_models
+
+def nonparallelCostCountPerSolution(pred_task_list):
+    temp_store_all_costs = [0 for i in range(len(pred_task_list[0]))]
+    for pred_task in pred_task_list:
+        for idx in range(len(pred_task)):
+            temp_store_all_costs[idx] += pred_task[idx]
+    return temp_store_all_costs
