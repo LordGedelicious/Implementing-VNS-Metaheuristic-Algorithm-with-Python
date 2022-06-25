@@ -234,3 +234,6 @@ def nonparallelCostCountPerSolution(pred_task_list):
         for idx in range(len(pred_task)):
             temp_store_all_costs[idx] += pred_task[idx]
     return temp_store_all_costs
+
+def haltProgress():
+    delayProgram = input("Enter anything to continue...")
