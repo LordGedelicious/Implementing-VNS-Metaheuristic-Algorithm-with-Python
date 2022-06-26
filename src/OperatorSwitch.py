@@ -12,6 +12,8 @@ import random
 import time
 
 def startOperatorSwitch(system, partitions):
+    # Attempts to switch the resource used in a task for every task in the partition
+    # A task can be switched from one resource to another resource as long as it follows the cycle time rule
     start_time = time.time()
     solution_list = ['HRC','R','H']
     for task_name in partitions:

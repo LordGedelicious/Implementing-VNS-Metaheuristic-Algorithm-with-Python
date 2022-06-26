@@ -21,6 +21,7 @@ def doesFilenameExist(filename):
     return os.path.isfile(path_to_file)
 
 def main():
+    print("| Variable Neighborhood Search Algorithm Program |")
     main_system = System()
     bool_FilenameExist = False
     while not bool_FilenameExist:

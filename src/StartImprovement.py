@@ -24,7 +24,7 @@ def checkKValueContents(system, partitions, k_value):
 
 
 def StartImprovement(system):
-    # main_system.printContents()
+    # Create a list of partitions (neighborhoods) with the amount of k_value + 1
     k_value = 0
     while k_value <= 0:
         k_value = int(input("Enter the value of k (must be greater than 0): "))

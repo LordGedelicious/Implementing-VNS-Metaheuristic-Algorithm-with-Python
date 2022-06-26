@@ -14,6 +14,7 @@ import random
 import time
 
 def getStationListFromPartitions(system, partitions):
+    # Returns the station list for all tasks in the partitions
     station_list = []
     for task_name in partitions:
         task = system.returnTask(task_name)
@@ -23,6 +24,15 @@ def getStationListFromPartitions(system, partitions):
     return station_list
 
 def startShaking(system, partitions):
+    # Shaking is a process of finding unique random points in a partition for s_value times
+    # After finding that point, it will be "shaked" with other points in the partition
+    # Two tasks that are successfully shaked will switch origin station
+    # Shaking is considered valid if:
+    # 1. Precedence rule is not violated
+    # 2. Cycle time rule is not violated
+    # 3. Both tasks are not from singular stations
+    # 4. Both tasks are not from the same station
+    # If shaking is a success, perform local search with the two tasks from shaking process as reference points
     start_time = time.time()
     s_value = system.returnSValue()
     station_list = system.returnStationList()
@@ -91,9 +101,3 @@ def startShaking(system, partitions):
     total_time = end_time - start_time
     print("Elapsed time for shaking process: {0:.3f} seconds".format(total_time))
     return system, total_time
-    
-                
-                
-                
-                
-        

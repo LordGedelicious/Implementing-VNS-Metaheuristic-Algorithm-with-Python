@@ -9,6 +9,9 @@ import copy
 import time
 
 def startStationAllocation(system, partition):
+    # This function will attempt to allocate all tasks in the partition to stations
+    # Station will first be ordered ascendingly from the least remaining cycle time to the most remaining cycle time
+    # Tasks from stations with lower priority can be moved to stations with higher priority but not the other way around.
     start_time = time.time()
     task_list_in_partition = copy.deepcopy(partition)
     station_list_in_partition = []

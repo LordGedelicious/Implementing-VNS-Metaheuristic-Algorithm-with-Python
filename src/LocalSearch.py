@@ -21,6 +21,9 @@ def LocalSearch(system, first_point, second_point, initial_cost):
     shaking_second_point = copy.deepcopy(second_point)
     shaking_initial_cost = copy.deepcopy(initial_cost)
     temp_storage = [first_point,second_point]
+    # Reference point is the shaking point that is used to compare with the other possible shaking points
+    # Second point is the point that will be incremented and decremented in the local search process
+    # Reference point and second point are picked randomly
     reference_point = random.choice(temp_storage)
     reference_task = system.returnTask(reference_point)
     task_list = system.returnTaskNames()
@@ -29,9 +32,19 @@ def LocalSearch(system, first_point, second_point, initial_cost):
     print("\nReference point (to be switched): {}".format(reference_point))
     print("Second point (for plus/minus one): {}".format(second_point))
     a_value = system.returnAValue()
+    # plus_one_task_name and minus_one_task_name are the tasks that are incremented and decremented in the local search process
     plus_one_task_name = copy.deepcopy(second_point)
     minus_one_task_name = copy.deepcopy(second_point)
+    # Store valid moves in the local search process
+    # Store as list of [A,B,C] with A being the first point, B being the second point, and C being the cost of the move
     store_valid_moves = []
+    # Conditions for a valid move:
+    # 1. Precedence rule is still valid after the move
+    # 2. Cycle time rule is still valid after the move
+    # 3. Both tasks are not from the same station
+    # 4. Both tasks are not the same task
+    # 5. Both tasks are not from two singular stations
+    # 6. Move is not the same as the shaking move
     while a_value > 0:
         plus_one_task_name += 1
         if plus_one_task_name in task_list:
@@ -101,6 +114,8 @@ def LocalSearch(system, first_point, second_point, initial_cost):
             print("Task {} does not exist".format(minus_one_task_name))
         a_value -= 1
     # Find the best move
+    # If there are multiple best moves, pick the best one (with the minimum cost)
+    # IF there are no best moves, use the shaking results
     if len(store_valid_moves) == 0:
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -118,6 +133,8 @@ def LocalSearch(system, first_point, second_point, initial_cost):
     localSearch_initial_cost = best_move[2]
     print("Local search minimum cost is {} by switching task {} and {}.".format(localSearch_initial_cost, localSearch_first_point, localSearch_second_point))
     print("Shaking cost is {} by switching task {} and {}.".format(shaking_initial_cost, shaking_first_point, shaking_second_point))
+    # If the local search cost is less than the shaking cost, use the local search results
+    # If not, use the shaking results
     if localSearch_initial_cost < shaking_initial_cost:
         first_point_task = system.returnTask(localSearch_first_point)
         second_point_task = system.returnTask(localSearch_second_point)
