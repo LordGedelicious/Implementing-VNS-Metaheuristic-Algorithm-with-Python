@@ -174,7 +174,7 @@ def countTotalCostCycleTime(system):
     station_list = system.returnStationList()
     for station in station_list:
         final_cost = checkCycleTimeRule(system, station, False)
-        print("For station {} the final cost is {}".format(station, final_cost))
+        print("For station {} the final cycle time list is {}".format(station, final_cost))
         max_cycle_time = max(max_cycle_time, max(final_cost))
     print("The max cycle time is {}".format(max_cycle_time))
     return max_cycle_time

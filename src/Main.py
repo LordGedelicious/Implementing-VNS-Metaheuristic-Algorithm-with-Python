@@ -53,13 +53,39 @@ def main():
     print("The initial total cost of the system is {}".format(main_system.countTotalCost()))
     haltProgress()
     partitions = StartImprovement(main_system)
+    ref_system = copy.deepcopy(main_system)
     for partition in partitions:
-        ref_system = main_system
-        changed_system = copy.deepcopy(ref_system)
+        isOldSystemBetter = False
         print("Partition: {}".format(partition))
-        changed_system = startShaking(changed_system, partition)
-        haltProgress()
-        changed_system = startOperatorSwitch(changed_system, partition)
-        haltProgress()
-        break
+        while not isOldSystemBetter:
+            changed_system = copy.deepcopy(ref_system)
+            print("Attempting Shaking process...")
+            haltProgress()
+            changed_system = startShaking(changed_system, partition)
+            print("Next, attempting operator switch...")
+            haltProgress()
+            changed_system = startOperatorSwitch(changed_system, partition)
+            print("\nOperator Switching process complete.")
+            print("Next, attempting station allocation...")
+            haltProgress()
+            changed_system = startStationAllocation(changed_system, partition)
+            print("\nStation Allocation process complete.")
+            print("Comparing original system's cost with the changed system's cost...")
+            haltProgress()
+            old_system_cost = ref_system.countTotalCost()
+            changed_system_cost = changed_system.countTotalCost()
+            if old_system_cost < changed_system_cost:
+                print("The changed system is better than the original system.")
+                print("Attempting to repeat the entire process from start...")
+                isOldSystemBetter = False
+                ref_system = copy.deepcopy(changed_system)
+                haltProgress()
+            else:
+                print("The original system is better than the changed system.")
+                isOldSystemBetter = True
+                print("Moving on to the next partition...")
+                haltProgress()
+    print("The final total cost of the system is {}".format(ref_system.countTotalCost()))
+    print("Final composition of the system:")
+    ref_system.printContents()
 main()
