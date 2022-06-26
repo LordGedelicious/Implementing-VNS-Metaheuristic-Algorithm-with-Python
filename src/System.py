@@ -207,7 +207,7 @@ class System:
             print("List of models in task:")
             i.printModels()
             print("Direct predecessors of this task: {}".format(i.returnDirectPredecessors()))
-            print("Predecessors of this task: {}".format(i.returnPredecessors()))
+            # print("Predecessors of this task: {}".format(i.returnPredecessors()))
             print("Direct successors of this task: {}".format(i.returnDirectSuccessors()))
             print("From early solution, the task's initial solution is {}".format(
                 i.returnInitialSolution()))

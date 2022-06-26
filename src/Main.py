@@ -52,6 +52,14 @@ def main():
     main_system.printContents()
     print("The initial total cost of the system is {}".format(main_system.countTotalCost()))
     haltProgress()
+    station_list = main_system.returnStationList()
+    for station in station_list:
+        if not checkCycleTimeRule(main_system, station, True):
+            print("Station {} violates Cycle Time Rule.".format(station))
+            sys.exit("Early solution doesn't pass the Cycle Time Rule.")
+        if not checkPrecedenceRule(main_system, station):
+            print("Station {} violates Precedence Rule.".format(station))
+            sys.exit("Early solution doesn't pass the Precedence Rule.")
     partitions = StartImprovement(main_system)
     ref_system = copy.deepcopy(main_system)
     for partition in partitions:
@@ -87,8 +95,8 @@ def main():
                 isOldSystemBetter = True
                 print("Moving on to the next partition...")
                 haltProgress()
-    print("The final total cost of the system is {}".format(ref_system.countTotalCost()))
     print("Final composition of the system:")
     ref_system.printContents()
+    print("The final total cost of the system is {}".format(ref_system.countTotalCost()))
     print("\nComputation complete.")
 main()

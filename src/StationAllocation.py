@@ -18,6 +18,7 @@ def startStationAllocation(system, partition):
             station_list_in_partition.append(task_station)
     station_list_ordered = sortStationList(system, station_list_in_partition)
     cant_be_moved_tasks = []
+    checked_station_list = []
     for station_list_idx in range(len(station_list_ordered)):
         ref_station = station_list_ordered[station_list_idx][0]
         tasks_in_ref_station = system.returnTaskListByStation(ref_station)
@@ -29,18 +30,28 @@ def startStationAllocation(system, partition):
             if checkIfSameStation(system, task_name, ref_station):
                 print("Task {} can't be inserted into station {} because task {} is already there.".format(task_name, ref_station, task_name))
                 continue
-            if task_name in cant_be_moved_tasks:
+            if task_name in cant_be_moved_tasks or ref_task_station in checked_station_list:
                 print("Task {} can't be inserted into station {} because task {} has higher r_value of priority.".format(task_name, ref_station, task_name))
             ref_task.setOriginStation(ref_station)
-            if not checkPrecedenceRule(system, ref_station) or not checkPrecedenceRule(system, ref_task_station):
+            isFailPrecedenceCheck = True
+            isFailCycleTimeCheck = True
+            for station in station_list_in_system:
+                if not isFailPrecedenceCheck and not isFailCycleTimeCheck:
+                    break
+                if not checkPrecedenceRule(system, station):
+                    isFailPrecedenceCheck = False
+                if not checkCycleTimeRule(system, station, True):
+                    isFailCycleTimeCheck = False
+            if not isFailPrecedenceCheck:
                 ref_task.setOriginStation(ref_task_station)
                 print("Task {} can't be inserted into station {} because of precedence rule violation.".format(task_name, ref_station))
                 continue
-            if not checkCycleTimeRule(system, ref_station, True):
+            if not isFailCycleTimeCheck:
                 ref_task.setOriginStation(ref_task_station)
                 print("Task {} can't be inserted into station {} because of Cycle Time rule violation.".format(task_name, ref_station))
                 continue
             print("Task {} is now inserted into station {}.".format(task_name, ref_station))
+        checked_station_list.append(ref_station)
     print("Total cost of the system now is: {}".format(system.countTotalCost()))
     return system
 
