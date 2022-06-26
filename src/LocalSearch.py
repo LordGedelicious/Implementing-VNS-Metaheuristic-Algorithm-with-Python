@@ -106,11 +106,11 @@ def LocalSearch(system, first_point, second_point, initial_cost):
         first_point_task = system.returnTask(localSearch_first_point)
         second_point_task = system.returnTask(localSearch_second_point)
         system.switchStationsOfTwoTasks(first_point_task, second_point_task)
-        print("\n Local Search results will be used by switching {} with {} with final cost {}".format(localSearch_first_point, localSearch_second_point, localSearch_initial_cost))
+        print("\nLocal Search results will be used by switching {} with {} with final cost {}".format(localSearch_first_point, localSearch_second_point, localSearch_initial_cost))
     else:
         first_point_task = system.returnTask(shaking_first_point)
         second_point_task = system.returnTask(shaking_second_point)
         system.switchStationsOfTwoTasks(first_point_task, second_point_task)
-        print("\n Shaking results will be used by switching {} with {} with final cost {}".format(shaking_first_point, shaking_second_point, shaking_initial_cost))
+        print("\nShaking results will be used by switching {} with {} with final cost {}".format(shaking_first_point, shaking_second_point, shaking_initial_cost))
     return system
 

@@ -74,7 +74,9 @@ def main():
             haltProgress()
             old_system_cost = ref_system.countTotalCost()
             changed_system_cost = changed_system.countTotalCost()
-            if old_system_cost < changed_system_cost:
+            print("Original system's cost: {}".format(old_system_cost))
+            print("Changed system's cost: {}".format(changed_system_cost))
+            if old_system_cost > changed_system_cost:
                 print("The changed system is better than the original system.")
                 print("Attempting to repeat the entire process from start...")
                 isOldSystemBetter = False
@@ -88,4 +90,5 @@ def main():
     print("The final total cost of the system is {}".format(ref_system.countTotalCost()))
     print("Final composition of the system:")
     ref_system.printContents()
+    print("\nComputation complete.")
 main()
