@@ -41,24 +41,24 @@ The directory contain the following files and folders:
 
 Two ways to run the program:
 1. Using Batch File
-..* Edit the run.bat file.
-..* The run.bat file has the following structure:
++ Edit the run.bat file.
++ The run.bat file has the following structure:
 ```
 @echo off
 <path to the python.exe> <path to the Main.py file in the src folder>
 pause
 ```
-..* Change the path to the python.exe and Main.py to the path of the files in your system
-..* Double click the run.bat file in the file explorer
-..* Input necessary information about the system
-..* Run the program as the prompt says
++ Change the path to the python.exe and Main.py to the path of the files in your system
++ Double click the run.bat file in the file explorer
++ Input necessary information about the system
++ Run the program as the prompt says
 
 2. Using Manual Python Script Manually
-..* Open the src folder inside the main folder
-..* Open Terminal
-..* Type and run `py Main.py`
-..* Input necessary information about the system
-..* Run the program as the prompt says
++ Open the src folder inside the main folder
++ Open Terminal on that directory
++ Type and run `py Main.py`
++ Input necessary information about the system
++ Run the program as the prompt says
 
 ## Programmer
 - <a href = "https://github.com/LordGedelicious">Gede Prasidha Bhawarnawa (13520004)</a>
