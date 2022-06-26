@@ -11,6 +11,7 @@ from StationAllocation import *
 from OperatorSwitch import *
 
 import os
+import time
 # other imports
 
 
@@ -62,6 +63,7 @@ def main():
             sys.exit("Early solution doesn't pass the Precedence Rule.")
     partitions = StartImprovement(main_system)
     ref_system = copy.deepcopy(main_system)
+    total_time = 0
     for partition in partitions:
         isOldSystemBetter = False
         print("Partition: {}".format(partition))
@@ -69,16 +71,19 @@ def main():
             changed_system = copy.deepcopy(ref_system)
             print("Attempting Shaking process...")
             haltProgress()
-            changed_system = startShaking(changed_system, partition)
+            changed_system, shaking_time = startShaking(changed_system, partition)
             print("Next, attempting operator switch...")
+            total_time += shaking_time
             haltProgress()
-            changed_system = startOperatorSwitch(changed_system, partition)
+            changed_system, operator_switch_time = startOperatorSwitch(changed_system, partition)
             print("\nOperator Switching process complete.")
             print("Next, attempting station allocation...")
+            total_time += operator_switch_time
             haltProgress()
-            changed_system = startStationAllocation(changed_system, partition)
+            changed_system, station_allocation_time = startStationAllocation(changed_system, partition)
             print("\nStation Allocation process complete.")
             print("Comparing original system's cost with the changed system's cost...")
+            total_time += station_allocation_time
             haltProgress()
             old_system_cost = ref_system.countTotalCost()
             changed_system_cost = changed_system.countTotalCost()
@@ -98,5 +103,7 @@ def main():
     print("Final composition of the system:")
     ref_system.printContents()
     print("The final total cost of the system is {}".format(ref_system.countTotalCost()))
+    print("Total time for computation : {0:.3f} seconds".format(total_time))
     print("\nComputation complete.")
+
 main()

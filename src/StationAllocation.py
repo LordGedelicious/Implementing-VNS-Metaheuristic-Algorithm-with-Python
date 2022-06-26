@@ -6,8 +6,10 @@ from Helper import *
 from OperatorSwitch import *
 
 import copy
+import time
 
 def startStationAllocation(system, partition):
+    start_time = time.time()
     task_list_in_partition = copy.deepcopy(partition)
     station_list_in_partition = []
     station_list_in_system = system.returnStationList()
@@ -52,8 +54,11 @@ def startStationAllocation(system, partition):
                 continue
             print("Task {} is now inserted into station {}.".format(task_name, ref_station))
         checked_station_list.append(ref_station)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("Elapsed time for station allocation: {0:.3f} seconds".format(elapsed_time))
     print("Total cost of the system now is: {}".format(system.countTotalCost()))
-    return system
+    return system, elapsed_time
 
 def sortStationList(system, station_list):
     temp_storage = [] # Fill this with lists of [A,B] with A being the station name and B being the station's remainder cycle time

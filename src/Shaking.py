@@ -11,6 +11,7 @@ from LocalSearch import *
 
 import copy
 import random
+import time
 
 def getStationListFromPartitions(system, partitions):
     station_list = []
@@ -22,6 +23,7 @@ def getStationListFromPartitions(system, partitions):
     return station_list
 
 def startShaking(system, partitions):
+    start_time = time.time()
     s_value = system.returnSValue()
     station_list = system.returnStationList()
     initial_system_cost = copy.deepcopy(system.countTotalCost())
@@ -73,15 +75,22 @@ def startShaking(system, partitions):
                 system.switchStationsOfTwoTasks(first_point_task, second_point_task)
                 break
         if shakingSuccess:
+            end_time = time.time()
+            elapsed_time = end_time - start_time
             print("Successful shaking by switching {} and {} with cost being {}!".format(final_first_point, final_second_point, new_system_cost))
+            print("Elapsed time for shaking process: {0:.3f} seconds".format(elapsed_time))
             print("Next, attempts to perform local search.")
             haltProgress()
-            system = LocalSearch(system, final_first_point, final_second_point, new_system_cost)
-            break
+            system, local_search_time = LocalSearch(system, final_first_point, final_second_point, new_system_cost)
+            total_time = local_search_time + elapsed_time
+            return system, local_search_time
         else:
             print("Shaking failed.\n")
             s_value -= 1
-    return system
+    end_time = time.time()
+    total_time = end_time - start_time
+    print("Elapsed time for shaking process: {0:.3f} seconds".format(total_time))
+    return system, total_time
     
                 
                 

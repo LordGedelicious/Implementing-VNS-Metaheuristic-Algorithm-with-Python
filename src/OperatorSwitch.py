@@ -9,8 +9,10 @@ from StationAllocation import *
 
 import copy
 import random
+import time
 
 def startOperatorSwitch(system, partitions):
+    start_time = time.time()
     solution_list = ['HRC','R','H']
     for task_name in partitions:
         attempted_solutions = []
@@ -29,6 +31,9 @@ def startOperatorSwitch(system, partitions):
             else:
                 task.setInitialSolution(task_solution)
                 print("Operator Switch failed because violation of Cycle Time Rule.\n")
+    end_time = time.time()
+    elapsed_time = end_time - start_time
     print("OperatorSwitch: Done")
+    print("Elapsed time for operator switch: {0:.3f} seconds".format(elapsed_time))
     print("System's total cost: {}".format(str(system.countTotalCost())))
-    return system
+    return system, elapsed_time

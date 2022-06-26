@@ -10,11 +10,13 @@ from OperatorSwitch import *
 # Needs copy module to deep copy the system
 import copy
 import random
+import time
 
 def LocalSearch(system, first_point, second_point, initial_cost):
     # System, is the original system
     # First and second point is the two tasks that are switched successfully in the shaking process
     # Initial cost is the cost of the shaking process
+    start_time = time.time()
     shaking_first_point = copy.deepcopy(first_point)
     shaking_second_point = copy.deepcopy(second_point)
     shaking_initial_cost = copy.deepcopy(initial_cost)
@@ -100,10 +102,13 @@ def LocalSearch(system, first_point, second_point, initial_cost):
         a_value -= 1
     # Find the best move
     if len(store_valid_moves) == 0:
+        end_time = time.time()
+        elapsed_time = end_time - start_time
         print("No valid moves found")
         first_point_task = system.returnTask(shaking_first_point)
         second_point_task = system.returnTask(shaking_second_point)
         system.switchStationsOfTwoTasks(first_point_task, second_point_task)
+        print("Elapsed time for local search process: {0:.3f} seconds".format(elapsed_time))
         print("\nShaking results will be used by switching {} with {} with final cost {}".format(shaking_first_point, shaking_second_point, shaking_initial_cost))
         return system
     store_valid_moves.sort(key=lambda row: row[2])
@@ -123,5 +128,8 @@ def LocalSearch(system, first_point, second_point, initial_cost):
         second_point_task = system.returnTask(shaking_second_point)
         system.switchStationsOfTwoTasks(first_point_task, second_point_task)
         print("\nShaking results will be used by switching {} with {} with final cost {}".format(shaking_first_point, shaking_second_point, shaking_initial_cost))
-    return system
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("Time for local search process: {0:.3f} seconds".format(elapsed_time))
+    return system, elapsed_time
 
