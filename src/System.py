@@ -230,5 +230,6 @@ class System:
         print("The system's investment cost of robot resources is {}".format(self.returnInvestmentCostRobot()))
         print("The system's operational cost of human resources is {}".format(self.returnOperationalCostHuman()))
         print("The system's operational cost of robot resources is {}".format(self.returnOperationalCostRobot()))
+        print("The current cycle time value (tau) is {} units of time.".format(countTotalCostCycleTime(self)))
         print()
         

@@ -41,7 +41,7 @@ def ReadFile(filename, MainSystem):
                 combo_cost = current_row['model' + str(current_count) + "_hrc"]
                 new_model = Model(task_name, model_name, human_cost, machine_cost, combo_cost)
                 temp_task.addModel(new_model)
-            predecessor_list, num_of_pred = createListOfPredOrSucc(current_row['predecessor'])
+            predecessor_list, num_of_pred = createListOfPredOrSucc(str(current_row['predecessor']))
             successor_list, num_of_succ = createListOfPredOrSucc(current_row['successor'])
             initial_solution = current_row['initial_solution']
             originStation = current_row['belongsToStation']

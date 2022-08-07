@@ -125,7 +125,7 @@ def LocalSearch(system, first_point, second_point, initial_cost):
         system.switchStationsOfTwoTasks(first_point_task, second_point_task)
         print("Elapsed time for local search process: {0:.3f} seconds".format(elapsed_time))
         print("\nShaking results will be used by switching {} with {} with final cost {}".format(shaking_first_point, shaking_second_point, shaking_initial_cost))
-        return system
+        return system, elapsed_time
     store_valid_moves.sort(key=lambda row: row[2])
     best_move = store_valid_moves[0]
     localSearch_first_point = best_move[0]
