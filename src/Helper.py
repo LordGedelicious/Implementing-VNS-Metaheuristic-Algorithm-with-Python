@@ -1,6 +1,7 @@
 from audioop import reverse
 from itertools import count
 from numpy import integer
+import copy
 from Tasks import *
 from Models import *
 from Reader import *
@@ -34,18 +35,22 @@ def isStationAfter(station_1, station_2):
         return False
     else:
         return station_1 > station_2
-    
+
 # For rules' implementations
+
+
 def checkIfSameStationRule(system, task_name_a, task_name_b):
     # Return True if the two tasks are from the same station
     if system.returnStationFromTask(task_name_a) == system.returnStationFromTask(task_name_b):
         return True
     return False
 
+
 def checkIfSameStation(system, task_name_a, station_name):
     if system.returnStationFromTask(task_name_a) == station_name:
         return True
     return False
+
 
 def singularStationRule(system, task_name_a, task_name_b):
     # Check whether task_a and task_b both are from stations that has length of one
@@ -58,6 +63,7 @@ def singularStationRule(system, task_name_a, task_name_b):
     if len_station_a == 1 and len_station_b == 1:
         return False
     return True
+
 
 def checkPrecedenceRule(system, station_name):
     task_list = system.returnTaskListByStation(station_name)
@@ -74,101 +80,169 @@ def checkPrecedenceRule(system, station_name):
             return False
     return True
 
+
+def getTotalTimeCost(system, task_name):
+    task = system.returnTask(task_name)
+    task_models = task.returnAllModels()
+    total_time_cost = 0.0
+    for model in task_models:
+        if task.returnInitialSolution() == 'H':
+            total_time_cost += model.returnHumanCost()
+        elif task.returnInitialSolution() == 'R':
+            total_time_cost += model.returnMachineCost()
+        elif task.returnInitialSolution() == 'HRC':
+            total_time_cost += model.returnComboCost()
+    return total_time_cost
+
+
+def getValidTasks(system, uncompleted_task_list, task_list, operator, human_resource, robot_resource):
+    if human_resource and robot_resource and operator == 'HRC' and len(task_list) != 0:
+        can_modify_human = True
+        can_modify_robot = True
+    elif human_resource and operator == 'H' and len(task_list) != 0:
+        can_modify_human = True
+        can_modify_robot = False
+    elif robot_resource and operator == 'R' and len(task_list) != 0:
+        can_modify_robot = True
+        can_modify_human = False
+    else:
+        return None, uncompleted_task_list, task_list, human_resource, robot_resource
+    # To store all possible HRC tasks that can be completed in this iteration
+    temp_chosen_tasks = None
+    for task_name in task_list:
+        task = system.returnTask(task_name)
+        task_pred_count = task.returnNumOfPredecessors()
+        # Only process HRC tasks that have all their predecessors completed
+        for task_predecessor in task.returnPredecessors():
+            if task_predecessor not in uncompleted_task_list:
+                task_pred_count -= 1
+        if task_pred_count == 0:
+            if temp_chosen_tasks == None:
+                temp_chosen_tasks = task_name
+                human_resource = False if can_modify_human else human_resource
+                robot_resource = False if can_modify_robot else robot_resource
+                task_list.remove(task_name)
+                uncompleted_task_list.remove(task_name)
+            else:
+                current_task = temp_chosen_tasks
+                new_task = task_name
+                current_task_cost = getTotalTimeCost(system, current_task)
+                new_task_cost = getTotalTimeCost(system, new_task)
+                if current_task_cost > new_task_cost:
+                    temp_chosen_tasks = new_task
+                    human_resource = False if can_modify_human else human_resource
+                    robot_resource = False if can_modify_robot else robot_resource
+                    uncompleted_task_list.remove(new_task)
+                    uncompleted_task_list.append(current_task)
+                else:
+                    temp_chosen_tasks = current_task
+                    human_resource = False if can_modify_human else human_resource
+                    robot_resource = False if can_modify_robot else robot_resource
+    return temp_chosen_tasks, uncompleted_task_list, task_list, human_resource, robot_resource
+
+
+def getValidSubTasks(system, uncompleted_task_list, full_tasklist):
+    temp_task_list = []
+    for task_name in full_tasklist:
+        task = system.returnTask(task_name)
+        task_pred = task.returnPredecessors()
+        isTaskValid = True
+        for pred in task_pred:
+            if pred in uncompleted_task_list:
+                isTaskValid = False
+                break
+        if isTaskValid:
+            temp_task_list.append(task_name)
+    return temp_task_list
+
+
+def findMinimumCost(system, subtask_list):
+    temp_task_name = None
+    temp_task_cost = None
+    for task_name in subtask_list:
+        if temp_task_name == None:
+            temp_task_name = task_name
+            temp_task_cost = getTotalTimeCost(system, task_name)
+        else:
+            if getTotalTimeCost(system, task_name) < temp_task_cost:
+                temp_task_name = task_name
+                temp_task_cost = getTotalTimeCost(system, task_name)
+    return temp_task_name, temp_task_cost
+
+
 def checkCycleTimeRule(system, station, forRule):
-    # If forRule is True, check whether the station's cycle time is less than the task's cycle time
-    # If forRule is False, returns max time for models in all task in the station
-    # Check whether the cycle time of the tasks in the station is less than the cycle time of the system
+    # The assumption is that precedence rule has already been applied for the station and the system as a whole
     max_system_cycle_time = system.returnCycleTime()
     task_list = system.returnTaskListByStation(station)
     task_list.sort()
-    temp_storage = [] 
-    # Temp storage is a list of [A,B,C,D,...] with A being the source task 
-    # and B,C,D,... respectively being the H/R/HRC cost for each model in the task
+    # Create a list that keeps tracks of unfinished tasks
+    uncompleted_task_list = copy.deepcopy(task_list)
+    # Create three lists: to contain HRC tasks, R tasks and H tasks
+    hrc_tasks = []
+    r_tasks = []
+    h_tasks = []
+    # Fill the three lists with tasks from the task_list
     for task_name in task_list:
         task = system.returnTask(task_name)
-        direct_pred = task.returnDirectPredecessors()
-        # print("Task {} has direct predecessors {}".format(task_name, direct_pred))
-        if len(direct_pred) in [0,1]:
-            pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, direct_pred)
+        if task.returnInitialSolution() == 'HRC':
+            hrc_tasks.append(task_name)
+        elif task.returnInitialSolution() == 'R':
+            r_tasks.append(task_name)
+        elif task.returnInitialSolution() == 'H':
+            h_tasks.append(task_name)
         else:
-            pred_task = None
-        # If the task is starting task OR (the task has only one predecessor and it's not in the station)
-        if len(direct_pred) == 0 or (len(direct_pred) == 1 and pred_task is None):
-            temp_new_list = [task_name]
-            task = system.returnTask(task_name)
-            task_solution = task.returnInitialSolution()
-            temp_new_list += task.isolateModelCosts(task_solution)
-            # print("The added list is {}".format(temp_new_list))
-            temp_storage.append(temp_new_list)
-            continue
-        # If the task has only one predecessor and it's on the station (consecutive tasks)
-        elif len(direct_pred) == 1 and pred_task is not None:
-            temp_new_list = pred_task
-            temp_new_list[0] = task_name
-            task = system.returnTask(task_name)
-            task_solution = task.returnInitialSolution()
-            isolated_model_costs = task.isolateModelCosts(task_solution)
-            for idx in range(0, len(isolated_model_costs)):
-                temp_new_list[idx + 1] += isolated_model_costs[idx]
-            # print("The added list is {}".format(temp_new_list))
-            temp_storage.append(temp_new_list)
-            continue
-        # Multiple predecessors for the reference task
-        elif len(direct_pred) > 1:
-            count_existing_pred_in_station = 0
-            store_pred_task = []
-            for pred in direct_pred:
-                pred_task, temp_storage = whereIsPredInTempStorage(temp_storage, pred)
-                if pred_task is not None:
-                    count_existing_pred_in_station += 1
-                    store_pred_task.append(pred_task)
-            # If the task has multiple predecessors and all of them are NOT in the station
-            if count_existing_pred_in_station == 0:
-                temp_new_list = [task_name]
-                task = system.returnTask(task_name)
-                task_solution = task.returnInitialSolution()
-                temp_new_list += task.isolateModelCosts(task_solution)
-                # print("The added list is {}".format(temp_new_list))
-                temp_storage.append(temp_new_list)
-                continue
-            # If the task has multiple predecessors and ONLY ONE of them is in the station
-            elif count_existing_pred_in_station == 1:
-                temp_new_list = store_pred_task[0]
-                temp_new_list[0] = task_name
-                task = system.returnTask(task_name)
-                task_solution = task.returnInitialSolution()
-                isolated_model_costs = task.isolateModelCosts(task_solution)
-                for idx in range(0, len(isolated_model_costs)):
-                    temp_new_list[idx + 1] += isolated_model_costs[idx]
-                # print("The added list is {}".format(temp_new_list))
-                temp_storage.append(temp_new_list)
-                continue
-            # If the task has multiple predecessors and AT LEAST TWO of them are in the station
-            else:
-                max_cost_models = filterMaxCost(system, store_pred_task)
-                temp_new_list = [task_name]
-                temp_new_list += max_cost_models
-                task = system.returnTask(task_name)
-                task_solution = task.returnInitialSolution()
-                isolated_model_costs = task.isolateModelCosts(task_solution)
-                for idx in range(0, len(max_cost_models)):
-                    temp_new_list[idx + 1] += isolated_model_costs[idx]
-                # print("The added list is {}".format(temp_new_list))
-                temp_storage.append(temp_new_list)
-                continue
-    # Calculate the total cycle time for the station
-    final_cost = [0 for i in range(system.returnNumOfModels())]
-    # print("For station {}, the temp_storage is {}".format(station, temp_storage))
-    final_cost = filterMaxCost(system, temp_storage)
-    if forRule:
-        for cost in final_cost:
-            if cost > max_system_cycle_time:
-                return False
-        return True
+            print("ERROR: Initial solution is not H, R or HRC")
+    # Initialize the cycle time counter, human resource counter, robot resource counter
+    cycle_time = 0.0
+    can_process_hrc = True
+    # Create temporary human time and robot time
+    human_cycle_time = 0.0
+    robot_cycle_time = 0.0
+    # The loop will go on until every task in the station is completed
+    while len(uncompleted_task_list) != 0:
+        # Get only the tasks that are posssible to complete from each list
+        hrc_subtasks = getValidSubTasks(
+            system, uncompleted_task_list, hrc_tasks)
+        # Prioritizes HRC tasks over R and H tasks. Only search for R and H tasks if there are no HRC tasks to complete
+        if len(hrc_subtasks) != 0 and can_process_hrc:
+            if human_cycle_time > 0.0 or robot_cycle_time > 0.0:  # To prevent negative addition
+                cycle_time += max(human_cycle_time, robot_cycle_time)
+                human_cycle_time = 0.0
+                robot_cycle_time = 0.0
+            # Get the task that can be completed with the least cost
+            hrc_task, hrc_task_cost = findMinimumCost(system, hrc_subtasks)
+            cycle_time += hrc_task_cost
+            uncompleted_task_list.remove(hrc_task)
+            hrc_tasks.remove(hrc_task)
+        else:
+            # To process R tasks:
+            r_subtasks = getValidSubTasks(
+                system, uncompleted_task_list, r_tasks)
+            r_task, r_task_cost = findMinimumCost(system, r_subtasks)
+            robot_cycle_time += r_task_cost
+            uncompleted_task_list.remove(r_task)
+            r_tasks.remove(r_task)
+            # To process H tasks:
+            h_subtasks = getValidSubTasks(
+                system, uncompleted_task_list, h_tasks)
+            h_task, h_task_cost = findMinimumCost(system, h_subtasks)
+            human_cycle_time += h_task_cost
+            uncompleted_task_list.remove(h_task)
+            h_tasks.remove(h_task)
+        if human_cycle_time == robot_cycle_time:
+            can_process_hrc = True
+        else:
+            can_process_hrc = False
+    if forRule:  # If forRule is True, returns true or false whether the station's cycle time is less than the system's cycle time
+        if cycle_time < max_system_cycle_time:
+            return True
+        return False
     else:
-        return final_cost
+        return cycle_time
 
 # For Total Cost's Cycle Time calculation
+
+
 def countTotalCostCycleTime(system):
     max_cycle_time = 0
     station_list = system.returnStationList()
@@ -178,8 +252,8 @@ def countTotalCostCycleTime(system):
         max_cycle_time = max(max_cycle_time, max(final_cost))
     # print("The max cycle time is {}".format(max_cycle_time))
     return max_cycle_time
-            
-            
+
+
 def whereIsPredInTempStorage(temp_storage, pred):
     # Returns the index of the predecessor in the temp_storage with the costs
     for lists in temp_storage:
@@ -189,6 +263,7 @@ def whereIsPredInTempStorage(temp_storage, pred):
             idx = temp_storage.index(lists)
             return temp_storage.pop(idx), temp_storage
     return None, temp_storage
+
 
 def filterMaxCost(system, pred_task_list):
     # Find maximum time for each model in the pred_task_list
@@ -206,9 +281,12 @@ def filterMaxCost(system, pred_task_list):
             human_pred_task_list.append(pred_task[1:])
         elif task.returnInitialSolution() == "R":
             robot_pred_task_list.append(pred_task[1:])
-    robot_pred_task_list = nonparallelCostCountPerSolution(robot_pred_task_list) if len(robot_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
-    human_pred_task_list = nonparallelCostCountPerSolution(human_pred_task_list) if len(human_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
-    hrc_pred_task_list = nonparallelCostCountPerSolution(hrc_pred_task_list) if len(hrc_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    robot_pred_task_list = nonparallelCostCountPerSolution(robot_pred_task_list) if len(
+        robot_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    human_pred_task_list = nonparallelCostCountPerSolution(human_pred_task_list) if len(
+        human_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
+    hrc_pred_task_list = nonparallelCostCountPerSolution(hrc_pred_task_list) if len(
+        hrc_pred_task_list) > 0 else [0 for i in range(system.returnNumOfModels())]
     # print("The robot_pred_task_list is {}".format(robot_pred_task_list))
     # print("The human_pred_task_list is {}".format(human_pred_task_list))
     # print("The hrc_pred_task_list is {}".format(hrc_pred_task_list))
@@ -218,11 +296,11 @@ def filterMaxCost(system, pred_task_list):
         robot_compare_human.append(robot_pred_task_list)
         robot_compare_human.append(human_pred_task_list)
         robot_compare_human = filterMaxCostPerSolution(robot_compare_human)
-        return [x + y for x,y in zip(robot_compare_human, hrc_pred_task_list)]
+        return [x + y for x, y in zip(robot_compare_human, hrc_pred_task_list)]
     else:
-        return [x + y + z for x,y,z in zip(robot_pred_task_list, human_pred_task_list, hrc_pred_task_list)]
-        
-    
+        return [x + y + z for x, y, z in zip(robot_pred_task_list, human_pred_task_list, hrc_pred_task_list)]
+
+
 def filterMaxCostPerSolution(pred_task_list):
     temp_store_all_costs = [[0] for i in range(len(pred_task_list[0]))]
     for pred_task in pred_task_list:
@@ -233,12 +311,14 @@ def filterMaxCostPerSolution(pred_task_list):
         max_cost_models.append(max(model))
     return max_cost_models
 
+
 def nonparallelCostCountPerSolution(pred_task_list):
     temp_store_all_costs = [0 for i in range(len(pred_task_list[0]))]
     for pred_task in pred_task_list:
         for idx in range(len(pred_task)):
             temp_store_all_costs[idx] += pred_task[idx]
     return temp_store_all_costs
+
 
 def haltProgress():
     delayProgram = input("Enter anything to continue...")
