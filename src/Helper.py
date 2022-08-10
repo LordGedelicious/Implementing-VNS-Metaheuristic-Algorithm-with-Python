@@ -134,7 +134,7 @@ def checkCycleTimeRule(system, station, forRule):
     max_system_cycle_time = system.returnCycleTime()
     task_list = system.returnTaskListByStation(station)
     task_list.sort()
-    print("Currently checking station {}".format(station))
+    # print("Currently checking station {}".format(station))
     # Create a list that keeps tracks of unfinished tasks
     uncompleted_task_list = copy.deepcopy(task_list)
     # Create three lists: to contain HRC tasks, R tasks and H tasks
@@ -152,9 +152,9 @@ def checkCycleTimeRule(system, station, forRule):
             h_tasks.append(task_name)
         else:
             print("ERROR: Initial solution is not H, R or HRC")
-    print("Contents of hrc tasks: {}".format(hrc_tasks))
-    print("Contents of r tasks: {}".format(r_tasks))
-    print("Contents of h tasks: {}".format(h_tasks))
+    # print("Contents of hrc tasks: {}".format(hrc_tasks))
+    # print("Contents of r tasks: {}".format(r_tasks))
+    # print("Contents of h tasks: {}".format(h_tasks))
     # Initialize the cycle time counter, human resource counter, robot resource counter
     cycle_time = [0.0 for idx in range(system.returnNumOfModels())]
     can_process_hrc = True
@@ -210,7 +210,7 @@ def checkCycleTimeRule(system, station, forRule):
     print("Resulting final cycle time for station {} is {}\n".format(
         station, cycle_time))
     if forRule:  # If forRule is True, returns true or false whether the station's cycle time is less than the system's cycle time
-        if cycle_time < max_system_cycle_time:
+        if max(cycle_time) < max_system_cycle_time:
             return True
         return False
     else:
