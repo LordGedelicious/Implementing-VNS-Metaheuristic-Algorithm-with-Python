@@ -205,6 +205,8 @@ def checkCycleTimeRule(system, station, forRule):
             can_process_hrc = True
         else:
             can_process_hrc = False
+    cycle_time = [x + y + z for x, y,
+                  z in zip(cycle_time, human_cycle_time, robot_cycle_time)]
     print("Resulting final cycle time for station {} is {}\n".format(
         station, cycle_time))
     if forRule:  # If forRule is True, returns true or false whether the station's cycle time is less than the system's cycle time
